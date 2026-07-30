@@ -1,0 +1,80 @@
+// Package lint orchestrates the v1 checks (token counting, duplicate
+// detection, history flagging) and produces a Report. This is the
+// "ESLint for prompts" core — fully deterministic, no AI calls.
+package lint
+
+import (
+	"fmt"
+	"io"
+	"strings"
+
+	"github.com/smcguire/distilly/internal/dedupe"
+	"github.com/smcguire/distilly/internal/tokenizer"
+)
+
+// Report is the result of linting a single prompt.
+type Report struct {
+	InputTokens      int
+	Duplicates       []dedupe.Duplicate
+	Suggestions      []string
+	PotentialSavings float64 // fraction, e.g. 0.46 for 46%
+}
+
+// Run lints a raw prompt string and returns a Report.
+func Run(prompt string) Report {
+	lines := strings.Split(prompt, "\n")
+
+	total := tokenizer.Count(prompt)
+	dupes := dedupe.FindExact(lines)
+
+	var suggestions []string
+	savedTokens := 0
+
+	if len(dupes) > 0 {
+		suggestions = append(suggestions, "Remove duplicate instructions")
+		for _, d := range dupes {
+			// crude savings estimate: every repeat beyond the first is waste
+			for _, l := range d.Lines[1:] {
+				savedTokens += tokenizer.Count(l)
+			}
+		}
+	}
+
+	var savings float64
+	if total > 0 {
+		savings = float64(savedTokens) / float64(total)
+	}
+
+	return Report{
+		InputTokens:      total,
+		Duplicates:       dupes,
+		Suggestions:      suggestions,
+		PotentialSavings: savings,
+	}
+}
+
+// Print writes a human-readable report to w, in the style sketched out
+// in docs/roadmap.md.
+func (r Report) Print(w io.Writer) {
+	fmt.Fprintf(w, "Input Tokens: %d\n\n", r.InputTokens)
+
+	if len(r.Duplicates) > 0 {
+		fmt.Fprintln(w, "Duplicate Instructions")
+		fmt.Fprintln(w, "----------------------")
+		for _, d := range r.Duplicates {
+			fmt.Fprintf(w, "Keep: %q (found %d times)\n", d.Keep, len(d.Lines))
+		}
+		fmt.Fprintln(w)
+	}
+
+	if len(r.Suggestions) > 0 {
+		fmt.Fprintln(w, "Suggestions")
+		fmt.Fprintln(w, "-----------")
+		for _, s := range r.Suggestions {
+			fmt.Fprintf(w, "\u2713 %s\n", s)
+		}
+		fmt.Fprintln(w)
+	}
+
+	fmt.Fprintf(w, "Potential Savings: %.0f%%\n", r.PotentialSavings*100)
+}

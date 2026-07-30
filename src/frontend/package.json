@@ -1,0 +1,10 @@
+{
+  "name": "distilly-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "description": "React + Vite + Tailwind UI for the distilly desktop app (Milestone 4). Not wired up yet.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  }
+}
