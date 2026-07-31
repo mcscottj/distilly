@@ -33,7 +33,7 @@ docs/               Design notes, roadmap
 - [ ] Token counter
 - [ ] Duplicate instruction detector
 - [ ] Repeated example detector
-- [ ] History length flagger
+- [x] History length flagger
 - [ ] Cost estimator
 - [ ] Before/after diff view
 - [ ] CLI: `distilly-lint <file>` prints a lint report

@@ -9,12 +9,14 @@ import (
 	"strings"
 
 	"github.com/smcguire/distilly/internal/dedupe"
+	"github.com/smcguire/distilly/internal/history"
 	"github.com/smcguire/distilly/internal/tokenizer"
 )
 
 // Report is the result of linting a single prompt.
 type Report struct {
 	InputTokens      int
+	Sections         SectionTokens
 	Duplicates       []dedupe.Duplicate
 	Suggestions      []string
 	PotentialSavings float64 // fraction, e.g. 0.46 for 46%
@@ -23,9 +25,11 @@ type Report struct {
 // Run lints a raw prompt string and returns a Report.
 func Run(prompt string) Report {
 	lines := strings.Split(prompt, "\n")
+	sections := SplitSections(prompt)
 
 	total := tokenizer.Count(prompt)
 	dupes := dedupe.FindExact(lines)
+	turns := history.ParseTurns(sections.History)
 
 	var suggestions []string
 	savedTokens := 0
@@ -40,13 +44,23 @@ func Run(prompt string) Report {
 		}
 	}
 
+	if history.Flag(turns) {
+		suggestions = append(suggestions, "Compress history")
+	}
+
 	var savings float64
 	if total > 0 {
 		savings = float64(savedTokens) / float64(total)
 	}
 
 	return Report{
-		InputTokens:      total,
+		InputTokens: total,
+		Sections: SectionTokens{
+			System:   tokenizer.Count(sections.System),
+			Examples: tokenizer.Count(sections.Examples),
+			History:  tokenizer.Count(sections.History),
+			Question: tokenizer.Count(sections.Question),
+		},
 		Duplicates:       dupes,
 		Suggestions:      suggestions,
 		PotentialSavings: savings,
@@ -57,6 +71,14 @@ func Run(prompt string) Report {
 // in docs/roadmap.md.
 func (r Report) Print(w io.Writer) {
 	fmt.Fprintf(w, "Input Tokens: %d\n\n", r.InputTokens)
+
+	fmt.Fprintln(w, "Sections")
+	fmt.Fprintln(w, "--------")
+	fmt.Fprintf(w, "System Prompt   %d\n", r.Sections.System)
+	fmt.Fprintf(w, "Examples        %d\n", r.Sections.Examples)
+	fmt.Fprintf(w, "History         %d\n", r.Sections.History)
+	fmt.Fprintf(w, "Question        %d\n", r.Sections.Question)
+	fmt.Fprintln(w)
 
 	if len(r.Duplicates) > 0 {
 		fmt.Fprintln(w, "Duplicate Instructions")

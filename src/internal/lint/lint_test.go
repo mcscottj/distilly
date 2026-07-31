@@ -37,3 +37,32 @@ func TestRunNoFalsePositivesOnSimilarButDistinctLines(t *testing.T) {
 		t.Fatalf("expected no exact duplicates in example.txt, got %+v", report.Duplicates)
 	}
 }
+
+func TestRunFlagsLongHistoryAndPopulatesSections(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/long_history.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	report := Run(string(data))
+
+	if report.Sections.System == 0 {
+		t.Error("expected non-zero System section tokens")
+	}
+	if report.Sections.History == 0 {
+		t.Error("expected non-zero History section tokens")
+	}
+	if report.Sections.Question == 0 {
+		t.Error("expected non-zero Question section tokens")
+	}
+
+	found := false
+	for _, s := range report.Suggestions {
+		if s == "Compress history" {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("expected \"Compress history\" suggestion, got %+v", report.Suggestions)
+	}
+}
