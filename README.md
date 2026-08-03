@@ -30,7 +30,7 @@ docs/               Design notes, roadmap
 
 ## v1 goal: Prompt Linter (no AI required)
 
-- [ ] Token counter
+- [x] Token counter
 - [ ] Duplicate instruction detector
 - [ ] Repeated example detector
 - [x] History length flagger
