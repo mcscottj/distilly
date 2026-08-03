@@ -33,7 +33,7 @@ Tasks:
 - [x] internal/tokenizer: wrap a tiktoken-compatible library
 - [x] internal/lint: section splitter (system / examples / history / question)
 - [ ] internal/dedupe: exact + near-duplicate instruction detection
-- [ ] internal/cost: per-model $/token tables + estimator
+- [x] internal/cost: per-model $/token tables + estimator
 - [ ] internal/diff: unified diff renderer for before/after
 - [ ] cmd/lint: CLI wiring, flags, output formatting
 - [ ] testdata/prompts: a handful of real-world-style prompts for regression tests

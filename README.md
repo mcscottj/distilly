@@ -34,7 +34,7 @@ docs/               Design notes, roadmap
 - [ ] Duplicate instruction detector
 - [ ] Repeated example detector
 - [x] History length flagger
-- [ ] Cost estimator
+- [x] Cost estimator
 - [ ] Before/after diff view
 - [ ] CLI: `distilly-lint <file>` prints a lint report
 
