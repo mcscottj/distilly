@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/smcguire/distilly/internal/dedupe"
+	"distilly/internal/dedupe"
 )
 
 func TestRunFindsExactDuplicates(t *testing.T) {

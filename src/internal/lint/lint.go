@@ -8,11 +8,11 @@ import (
 	"io"
 	"strings"
 
-	"github.com/smcguire/distilly/internal/cost"
-	"github.com/smcguire/distilly/internal/dedupe"
-	"github.com/smcguire/distilly/internal/diff"
-	"github.com/smcguire/distilly/internal/history"
-	"github.com/smcguire/distilly/internal/tokenizer"
+	"distilly/internal/cost"
+	"distilly/internal/dedupe"
+	"distilly/internal/diff"
+	"distilly/internal/history"
+	"distilly/internal/tokenizer"
 )
 
 // Report is the result of linting a single prompt.

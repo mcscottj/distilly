@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/smcguire/distilly/internal/lint"
+	"distilly/internal/lint"
 )
 
 func main() {

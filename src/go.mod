@@ -1,4 +1,4 @@
-module github.com/smcguire/distilly
+module distilly
 
 go 1.22
 
