@@ -2,7 +2,10 @@ package lint
 
 import (
 	"os"
+	"strings"
 	"testing"
+
+	"github.com/smcguire/distilly/internal/dedupe"
 )
 
 func TestRunFindsExactDuplicates(t *testing.T) {
@@ -125,6 +128,27 @@ func TestRunNearDuplicatesIgnoreVariationInExamples(t *testing.T) {
 	if len(report.NearDuplicates) != 0 {
 		t.Fatalf("expected 0 near-duplicate groups (examples should vary freely), got %d: %+v",
 			len(report.NearDuplicates), report.NearDuplicates)
+	}
+}
+
+func TestDiffForDuplicateShowsEveryOccurrenceCollapsingToKeep(t *testing.T) {
+	d := dedupe.Duplicate{
+		Lines: []string{
+			"Always respond in JSON format.",
+			"Always respond in JSON format.",
+			"Always respond in JSON format.",
+		},
+		Keep:       "Always respond in JSON format.",
+		Confidence: 1.0,
+	}
+
+	got := DiffForDuplicate(d)
+
+	if strings.Count(got, "- Always respond in JSON format.") != 3 {
+		t.Errorf("expected 3 removed lines in diff, got:\n%s", got)
+	}
+	if strings.Count(got, "+ Always respond in JSON format.") != 1 {
+		t.Errorf("expected 1 added (kept) line in diff, got:\n%s", got)
 	}
 }
 

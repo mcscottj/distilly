@@ -35,7 +35,7 @@ docs/               Design notes, roadmap
 - [ ] Repeated example detector
 - [x] History length flagger
 - [x] Cost estimator
-- [ ] Before/after diff view
+- [x] Before/after diff view
 - [ ] CLI: `distilly-lint <file>` prints a lint report
 
 ## Later: v2+

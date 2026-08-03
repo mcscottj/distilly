@@ -10,6 +10,7 @@ import (
 
 	"github.com/smcguire/distilly/internal/cost"
 	"github.com/smcguire/distilly/internal/dedupe"
+	"github.com/smcguire/distilly/internal/diff"
 	"github.com/smcguire/distilly/internal/history"
 	"github.com/smcguire/distilly/internal/tokenizer"
 )
@@ -111,6 +112,13 @@ func Run(prompt, model string) Report {
 	}
 }
 
+// DiffForDuplicate renders a before/after diff for a single duplicate
+// group: every occurrence collapsing down to the one line that would be
+// kept.
+func DiffForDuplicate(d dedupe.Duplicate) string {
+	return diff.Render(diff.Lines(d.Lines, []string{d.Keep}))
+}
+
 // Print writes a human-readable report to w, in the style sketched out
 // in docs/roadmap.md.
 func (r Report) Print(w io.Writer) {
@@ -131,6 +139,13 @@ func (r Report) Print(w io.Writer) {
 			fmt.Fprintf(w, "Keep: %q (found %d times)\n", d.Keep, len(d.Lines))
 		}
 		fmt.Fprintln(w)
+
+		fmt.Fprintln(w, "Diff (safe to auto-apply)")
+		fmt.Fprintln(w, "-------------------------")
+		for _, d := range r.Duplicates {
+			fmt.Fprint(w, DiffForDuplicate(d))
+		}
+		fmt.Fprintln(w)
 	}
 
 	if len(r.NearDuplicates) > 0 {
@@ -141,6 +156,13 @@ func (r Report) Print(w io.Writer) {
 			for _, l := range d.Lines {
 				fmt.Fprintf(w, "  - %q\n", l)
 			}
+		}
+		fmt.Fprintln(w)
+
+		fmt.Fprintln(w, "Suggested Diff (not applied automatically)")
+		fmt.Fprintln(w, "-------------------------------------------")
+		for _, d := range r.NearDuplicates {
+			fmt.Fprint(w, DiffForDuplicate(d))
 		}
 		fmt.Fprintln(w)
 	}
