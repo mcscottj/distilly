@@ -32,7 +32,7 @@ Potential Savings: 46%
 Tasks:
 - [x] internal/tokenizer: wrap a tiktoken-compatible library
 - [x] internal/lint: section splitter (system / examples / history / question)
-- [ ] internal/dedupe: exact + near-duplicate instruction detection
+- [x] internal/dedupe: exact + near-duplicate instruction detection
 - [x] internal/cost: per-model $/token tables + estimator
 - [ ] internal/diff: unified diff renderer for before/after
 - [ ] cmd/lint: CLI wiring, flags, output formatting

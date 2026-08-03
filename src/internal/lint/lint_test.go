@@ -86,6 +86,48 @@ func TestRunEstimatesCostForKnownModel(t *testing.T) {
 	}
 }
 
+func TestRunFindsNearDuplicates(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/near_duplicates.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	report := Run(string(data), "")
+
+	if len(report.NearDuplicates) != 2 {
+		t.Fatalf("expected 2 near-duplicate groups, got %d: %+v", len(report.NearDuplicates), report.NearDuplicates)
+	}
+
+	found := false
+	for _, s := range report.Suggestions {
+		if s == "Review near-duplicate instructions" {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf(`expected "Review near-duplicate instructions" suggestion, got %+v`, report.Suggestions)
+	}
+}
+
+func TestRunNearDuplicatesIgnoreVariationInExamples(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/exact_duplicates.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	report := Run(string(data), "")
+
+	// exact_duplicates.txt has no explicit "System:" header, so everything
+	// from the first "Example N:" line onward — including enumerated
+	// "Example 1:"/"Example 2:" headers and "Q: ...France?"/"...Japan?"
+	// lines — falls into the Examples section. Near-duplicate detection
+	// must not flag that expected example-to-example variation.
+	if len(report.NearDuplicates) != 0 {
+		t.Fatalf("expected 0 near-duplicate groups (examples should vary freely), got %d: %+v",
+			len(report.NearDuplicates), report.NearDuplicates)
+	}
+}
+
 func TestRunReportsUnknownModel(t *testing.T) {
 	data, err := os.ReadFile("../../testdata/prompts/example.txt")
 	if err != nil {

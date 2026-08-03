@@ -16,9 +16,15 @@ import (
 
 // Report is the result of linting a single prompt.
 type Report struct {
-	InputTokens      int
-	Sections         SectionTokens
-	Duplicates       []dedupe.Duplicate
+	InputTokens int
+	Sections    SectionTokens
+	Duplicates  []dedupe.Duplicate
+	// NearDuplicates are lower-confidence groups (see dedupe.Duplicate.
+	// Confidence) that read as the same instruction but aren't
+	// byte/case-identical. These are reported for review, not folded
+	// into PotentialSavings/EstimatedSavingsUSD, since they require
+	// user approval before removal.
+	NearDuplicates   []dedupe.Duplicate
 	Suggestions      []string
 	PotentialSavings float64 // fraction, e.g. 0.46 for 46%
 
@@ -41,6 +47,13 @@ func Run(prompt, model string) Report {
 
 	total := tokenizer.Count(prompt)
 	dupes := dedupe.FindExact(lines)
+	// Near-duplicate detection is scoped to the System section only.
+	// Examples and History are expected to vary line-to-line (different
+	// Q/A pairs, different turns) — running lexical similarity over them
+	// would flag that expected variation as a false positive (e.g.
+	// "Example 1:"/"Example 2:" or "...capital of France?"/"...Japan?"
+	// score just as similar as a genuinely reworded instruction).
+	nearDupes := dedupe.FindNear(strings.Split(sections.System, "\n"), dedupe.DefaultNearThreshold)
 	turns := history.ParseTurns(sections.History)
 
 	var suggestions []string
@@ -54,6 +67,10 @@ func Run(prompt, model string) Report {
 				savedTokens += tokenizer.Count(l)
 			}
 		}
+	}
+
+	if len(nearDupes) > 0 {
+		suggestions = append(suggestions, "Review near-duplicate instructions")
 	}
 
 	if history.Flag(turns) {
@@ -84,6 +101,7 @@ func Run(prompt, model string) Report {
 			Question: tokenizer.Count(sections.Question),
 		},
 		Duplicates:          dupes,
+		NearDuplicates:      nearDupes,
 		Suggestions:         suggestions,
 		PotentialSavings:    savings,
 		Model:               model,
@@ -111,6 +129,18 @@ func (r Report) Print(w io.Writer) {
 		fmt.Fprintln(w, "----------------------")
 		for _, d := range r.Duplicates {
 			fmt.Fprintf(w, "Keep: %q (found %d times)\n", d.Keep, len(d.Lines))
+		}
+		fmt.Fprintln(w)
+	}
+
+	if len(r.NearDuplicates) > 0 {
+		fmt.Fprintln(w, "Near-Duplicate Instructions (review before removing)")
+		fmt.Fprintln(w, "-----------------------------------------------------")
+		for _, d := range r.NearDuplicates {
+			fmt.Fprintf(w, "Keep: %q (%.0f%% confidence, %d similar lines)\n", d.Keep, d.Confidence*100, len(d.Lines))
+			for _, l := range d.Lines {
+				fmt.Fprintf(w, "  - %q\n", l)
+			}
 		}
 		fmt.Fprintln(w)
 	}

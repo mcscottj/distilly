@@ -1,0 +1,9 @@
+System:
+You are a helpful assistant.
+Always respond in JSON format.
+Please always respond in JSON format.
+Do not explain your reasoning, just answer.
+Do not explain your reasoning; just answer
+
+Question:
+What is the capital of France?
