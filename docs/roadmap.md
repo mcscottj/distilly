@@ -35,8 +35,8 @@ Tasks:
 - [x] internal/dedupe: exact + near-duplicate instruction detection
 - [x] internal/cost: per-model $/token tables + estimator
 - [x] internal/diff: unified diff renderer for before/after
-- [ ] cmd/lint: CLI wiring, flags, output formatting
-- [ ] testdata/prompts: a handful of real-world-style prompts for regression tests
+- [x] cmd/lint: CLI wiring, flags, output formatting
+- [x] testdata/prompts: a handful of real-world-style prompts for regression tests
 
 ## Milestone 2 — Regression harness
 
