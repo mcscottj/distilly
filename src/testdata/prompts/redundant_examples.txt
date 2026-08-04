@@ -1,0 +1,21 @@
+System:
+You are a helpful assistant. Always respond in JSON format.
+
+Example 1:
+Q: What is the sum of 2 and 2?
+A: {"answer": 4}
+
+Example 2:
+Q: What is the capital of France?
+A: {"answer": "Paris"}
+
+Example 3:
+Q: What's the sum of 2 and 2?
+A: {"answer": 4}
+
+Example 4:
+Q: What is the capital of France?
+A: {"answer": "Paris"}
+
+Question:
+What is 5 + 5?

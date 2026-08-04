@@ -205,6 +205,115 @@ func TestApplyCollapsesNearDuplicatesWhenApproved(t *testing.T) {
 	}
 }
 
+func TestRunFindsDuplicateAndNearDuplicateExamples(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/redundant_examples.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	report := Run(string(data), "")
+
+	if len(report.DuplicateExamples) != 1 {
+		t.Fatalf("expected 1 exact-duplicate example group (the two identical France examples), got %d: %+v",
+			len(report.DuplicateExamples), report.DuplicateExamples)
+	}
+	if len(report.NearDuplicateExamples) != 1 {
+		t.Fatalf("expected 1 near-duplicate example group (the two 2+2 examples), got %d: %+v",
+			len(report.NearDuplicateExamples), report.NearDuplicateExamples)
+	}
+
+	for _, want := range []string{"Remove duplicate examples", "Review near-duplicate examples"} {
+		found := false
+		for _, s := range report.Suggestions {
+			if s == want {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("expected %q suggestion, got %+v", want, report.Suggestions)
+		}
+	}
+}
+
+// TestRunExactDuplicateLinesIgnoreCoincidentalOverlapBetweenExamples
+// guards a real bug found while building example-block clustering:
+// line-level exact-duplicate detection used to run over every line in
+// the prompt regardless of section, so two genuinely different examples
+// that happened to share one identical line (here, both answering
+// "4") would have that shared line silently stripped out of the second
+// example — corrupting it — even though the examples themselves are not
+// duplicates.
+func TestRunExactDuplicateLinesIgnoreCoincidentalOverlapBetweenExamples(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/redundant_examples.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	report := Run(string(data), "")
+
+	for _, d := range report.Duplicates {
+		if strings.Contains(d.Keep, `"answer": 4`) {
+			t.Errorf(`did not expect A: {"answer": 4} to be treated as a leaked/duplicated line — `+
+				`it only repeats between two distinct examples, got %+v`, d)
+		}
+	}
+}
+
+func TestApplyDoesNotCorruptDistinctExamplesSharingALine(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/redundant_examples.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	optimized := Apply(string(data), ApplyOptions{})
+
+	// Example 3 ("What's the sum of 2 and 2?") is a near-duplicate of
+	// Example 1, not an exact one, so it must survive Apply() with the
+	// zero-value ApplyOptions untouched — including its answer line,
+	// which coincidentally matches Example 1's.
+	if !strings.Contains(optimized, "Q: What's the sum of 2 and 2?") {
+		t.Fatalf("expected Example 3's question to survive, got:\n%s", optimized)
+	}
+	block := optimized[strings.Index(optimized, "Q: What's the sum of 2 and 2?"):]
+	if !strings.Contains(block, `A: {"answer": 4}`) {
+		t.Errorf("expected Example 3's answer line to survive alongside its question, got:\n%s", block)
+	}
+}
+
+func TestApplyCollapsesDuplicateExamplesKeepingFirstOccurrence(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/redundant_examples.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	optimized := Apply(string(data), ApplyOptions{})
+
+	if strings.Count(optimized, "capital of France") != 1 {
+		t.Errorf("expected the exact-duplicate France example to collapse to 1 occurrence, got:\n%s", optimized)
+	}
+	// The near-duplicate "sum of 2 and 2" examples are untouched by
+	// default — both must survive.
+	if strings.Count(optimized, "sum of 2 and 2") != 2 {
+		t.Errorf("expected both near-duplicate examples to survive without approval, got:\n%s", optimized)
+	}
+}
+
+func TestApplyCollapsesNearDuplicateExamplesWhenApproved(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/redundant_examples.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	optimized := Apply(string(data), ApplyOptions{ApproveNearDuplicates: true})
+
+	if strings.Count(optimized, "sum of 2 and 2") != 1 {
+		t.Errorf("expected the near-duplicate examples to collapse to 1 once approved, got:\n%s", optimized)
+	}
+	if !strings.Contains(optimized, "capital of France") {
+		t.Errorf("expected the distinct France example to survive, got:\n%s", optimized)
+	}
+}
+
 func TestRunReportsUnknownModel(t *testing.T) {
 	data, err := os.ReadFile("../../testdata/prompts/example.txt")
 	if err != nil {

@@ -57,6 +57,17 @@ func FindExact(lines []string) []Duplicate {
 // cosmetic rewordings.
 const DefaultNearThreshold = 0.7
 
+// DefaultExampleNearThreshold is FindNear's threshold when clustering
+// whole few-shot example blocks instead of single lines. It's higher
+// than DefaultNearThreshold: two genuinely different examples still
+// share a lot of boilerplate structure (the "Q: ... / A: ..." shape,
+// short shared words), so on longer, multi-line text the same absolute
+// edit distance lands at a much higher similarity ratio than it would
+// for a single instruction line. A threshold tuned for lines would
+// cluster distinct examples together; see internal/lint.SplitExamples
+// and the redundant_examples.txt fixture it's tested against.
+const DefaultExampleNearThreshold = 0.85
+
 var (
 	punctRe = regexp.MustCompile(`[^\w\s]`)
 	spaceRe = regexp.MustCompile(`\s+`)

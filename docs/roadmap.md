@@ -76,7 +76,15 @@ Tasks:
       exact duplicates (high confidence) keep auto-applying as before
 - [x] cmd/lint: `-fix` prints the optimized prompt; `-approve-near-duplicates`
       opts in to the low-confidence tier
-- [ ] internal/dedupe: example deduplication via clustering
+- [x] internal/lint: example deduplication via clustering — `SplitExamples`
+      extracts whole few-shot example blocks, `dedupe.FindExact`/`FindNear`
+      (at `DefaultExampleNearThreshold`) cluster redundant ones, and `Apply`
+      collapses exact whole-block duplicates automatically / near-duplicate
+      blocks once approved. Along the way, fixed a real bug: line-level
+      exact-duplicate detection used to reach into example blocks and could
+      corrupt a legitimately-different example that happened to share one
+      identical line with another (see `nonExampleLines` in
+      `internal/lint/examples.go`)
 - [ ] automatic JSON conversion for structured data
 
 ## Milestone 4 — Desktop app

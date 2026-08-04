@@ -56,4 +56,15 @@ var Cases = []Case{
 			"Format as markdown.",
 		},
 	},
+	{
+		Name:       "redundant examples: only the exact whole-block duplicate collapses, distinct examples survive with their content intact",
+		PromptFile: "redundant_examples.txt",
+		MustSurvive: []string{
+			"Q: What is the sum of 2 and 2?",
+			`A: {"answer": 4}`,
+			"Q: What's the sum of 2 and 2?",
+			"Q: What is the capital of France?",
+			`A: {"answer": "Paris"}`,
+		},
+	},
 }

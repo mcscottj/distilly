@@ -25,7 +25,16 @@ type Report struct {
 	// byte/case-identical. These are reported for review, not folded
 	// into PotentialSavings/EstimatedSavingsUSD, since they require
 	// user approval before removal.
-	NearDuplicates   []dedupe.Duplicate
+	NearDuplicates []dedupe.Duplicate
+
+	// DuplicateExamples/NearDuplicateExamples are the same idea as
+	// Duplicates/NearDuplicates, but clustered at the whole few-shot
+	// example level (see SplitExamples) instead of per-line. A single
+	// redundant example teaches the model nothing new no matter how
+	// different its individual lines look from other sections' content.
+	DuplicateExamples     []dedupe.Duplicate
+	NearDuplicateExamples []dedupe.Duplicate
+
 	Suggestions      []string
 	PotentialSavings float64 // fraction, e.g. 0.46 for 46%
 
@@ -47,7 +56,11 @@ func Run(prompt, model string) Report {
 	sections := SplitSections(prompt)
 
 	total := tokenizer.Count(prompt)
-	dupes := dedupe.FindExact(lines)
+	// Scoped to lines that also occur outside example blocks — see
+	// nonExampleLines. Otherwise two genuinely different examples that
+	// happen to share one identical line (e.g. the same answer) would
+	// be misread as a leaked/duplicated instruction.
+	dupes := filterToLinesSeenOutsideExamples(dedupe.FindExact(lines), nonExampleLines(prompt))
 	// Near-duplicate detection is scoped to the System section only.
 	// Examples and History are expected to vary line-to-line (different
 	// Q/A pairs, different turns) — running lexical similarity over them
@@ -56,6 +69,10 @@ func Run(prompt, model string) Report {
 	// score just as similar as a genuinely reworded instruction).
 	nearDupes := dedupe.FindNear(strings.Split(sections.System, "\n"), dedupe.DefaultNearThreshold)
 	turns := history.ParseTurns(sections.History)
+
+	exampleBodies := SplitExamples(prompt)
+	dupeExamples := dedupe.FindExact(exampleBodies)
+	nearDupeExamples := dedupe.FindNear(exampleBodies, dedupe.DefaultExampleNearThreshold)
 
 	var suggestions []string
 	savedTokens := 0
@@ -72,6 +89,19 @@ func Run(prompt, model string) Report {
 
 	if len(nearDupes) > 0 {
 		suggestions = append(suggestions, "Review near-duplicate instructions")
+	}
+
+	if len(dupeExamples) > 0 {
+		suggestions = append(suggestions, "Remove duplicate examples")
+		for _, d := range dupeExamples {
+			for _, body := range d.Lines[1:] {
+				savedTokens += tokenizer.Count(body)
+			}
+		}
+	}
+
+	if len(nearDupeExamples) > 0 {
+		suggestions = append(suggestions, "Review near-duplicate examples")
 	}
 
 	if history.Flag(turns) {
@@ -101,14 +131,16 @@ func Run(prompt, model string) Report {
 			History:  tokenizer.Count(sections.History),
 			Question: tokenizer.Count(sections.Question),
 		},
-		Duplicates:          dupes,
-		NearDuplicates:      nearDupes,
-		Suggestions:         suggestions,
-		PotentialSavings:    savings,
-		Model:               model,
-		CostKnown:           costKnown,
-		EstimatedCostUSD:    estCost,
-		EstimatedSavingsUSD: estSavings,
+		Duplicates:            dupes,
+		NearDuplicates:        nearDupes,
+		DuplicateExamples:     dupeExamples,
+		NearDuplicateExamples: nearDupeExamples,
+		Suggestions:           suggestions,
+		PotentialSavings:      savings,
+		Model:                 model,
+		CostKnown:             costKnown,
+		EstimatedCostUSD:      estCost,
+		EstimatedSavingsUSD:   estSavings,
 	}
 }
 
@@ -125,10 +157,12 @@ func DiffForDuplicate(d dedupe.Duplicate) string {
 type ApplyOptions struct {
 	// ApproveNearDuplicates opts in to collapsing near-duplicate lines
 	// in the System section (dedupe.Duplicate.Confidence < 1.0) down to
-	// each group's Keep line. Off by default: near-duplicates are a
-	// cosmetic-similarity guess, not a proven-identical match, so
-	// collapsing them without explicit approval risks the
-	// over-optimization internal/regression guards against.
+	// each group's Keep line, and near-duplicate example blocks (see
+	// SplitExamples) down to each group's Keep example. Off by default:
+	// near-duplicates are a cosmetic-similarity guess, not a
+	// proven-identical match, so collapsing them without explicit
+	// approval risks the over-optimization internal/regression guards
+	// against.
 	ApproveNearDuplicates bool
 }
 
@@ -140,7 +174,7 @@ type ApplyOptions struct {
 // lines once a user has reviewed the report's near-duplicate diff.
 func Apply(prompt string, opts ApplyOptions) string {
 	lines := strings.Split(prompt, "\n")
-	dupes := dedupe.FindExact(lines)
+	dupes := filterToLinesSeenOutsideExamples(dedupe.FindExact(lines), nonExampleLines(prompt))
 
 	dropKey := make(map[string]bool, len(dupes))
 	for _, d := range dupes {
@@ -178,7 +212,30 @@ func Apply(prompt string, opts ApplyOptions) string {
 		}
 		out = append(out, line)
 	}
-	return strings.Join(out, "\n")
+	prompt = strings.Join(out, "\n")
+
+	// Example blocks: exact duplicates keep their first occurrence and
+	// drop the rest (always safe); near-duplicates only drop down to
+	// their Keep example once approved.
+	exampleBodies := SplitExamples(prompt)
+	dropExactBody := map[string]bool{}
+	for _, d := range dedupe.FindExact(exampleBodies) {
+		dropExactBody[strings.ToLower(strings.TrimSpace(d.Keep))] = true
+	}
+
+	removeNearBody := map[string]bool{}
+	if opts.ApproveNearDuplicates {
+		for _, d := range dedupe.FindNear(exampleBodies, dedupe.DefaultExampleNearThreshold) {
+			keepKey := strings.ToLower(strings.TrimSpace(d.Keep))
+			for _, b := range d.Lines {
+				if key := strings.ToLower(strings.TrimSpace(b)); key != keepKey {
+					removeNearBody[key] = true
+				}
+			}
+		}
+	}
+
+	return removeExampleBlocks(prompt, dropExactBody, removeNearBody)
 }
 
 // Print writes a human-readable report to w, in the style sketched out
@@ -224,6 +281,36 @@ func (r Report) Print(w io.Writer) {
 		fmt.Fprintln(w, "Suggested Diff (not applied automatically)")
 		fmt.Fprintln(w, "-------------------------------------------")
 		for _, d := range r.NearDuplicates {
+			fmt.Fprint(w, DiffForDuplicate(d))
+		}
+		fmt.Fprintln(w)
+	}
+
+	if len(r.DuplicateExamples) > 0 {
+		fmt.Fprintln(w, "Duplicate Examples")
+		fmt.Fprintln(w, "------------------")
+		for _, d := range r.DuplicateExamples {
+			fmt.Fprintf(w, "Keep:\n%s\n(found %d times)\n\n", d.Keep, len(d.Lines))
+		}
+
+		fmt.Fprintln(w, "Diff (safe to auto-apply)")
+		fmt.Fprintln(w, "-------------------------")
+		for _, d := range r.DuplicateExamples {
+			fmt.Fprint(w, DiffForDuplicate(d))
+		}
+		fmt.Fprintln(w)
+	}
+
+	if len(r.NearDuplicateExamples) > 0 {
+		fmt.Fprintln(w, "Near-Duplicate Examples (review before removing)")
+		fmt.Fprintln(w, "--------------------------------------------------")
+		for _, d := range r.NearDuplicateExamples {
+			fmt.Fprintf(w, "Keep (%.0f%% confidence, %d similar examples):\n%s\n\n", d.Confidence*100, len(d.Lines), d.Keep)
+		}
+
+		fmt.Fprintln(w, "Suggested Diff (not applied automatically)")
+		fmt.Fprintln(w, "-------------------------------------------")
+		for _, d := range r.NearDuplicateExamples {
 			fmt.Fprint(w, DiffForDuplicate(d))
 		}
 		fmt.Fprintln(w)
