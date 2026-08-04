@@ -23,6 +23,7 @@ internal/dedupe/    Duplicate instruction / repeated example detection
 internal/history/   Conversation history compression
 internal/cost/      Token -> $ cost estimation per model
 internal/diff/      Side-by-side before/after diff rendering
+internal/regression/ (Prompt, constraints-that-must-survive) pairs guarding the optimizer
 frontend/           React + Vite + Tailwind UI (used later by the Wails desktop app)
 testdata/prompts/   Sample prompts used for regression testing heuristics
 docs/               Design notes, roadmap

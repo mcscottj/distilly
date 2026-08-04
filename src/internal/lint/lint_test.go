@@ -152,6 +152,37 @@ func TestDiffForDuplicateShowsEveryOccurrenceCollapsingToKeep(t *testing.T) {
 	}
 }
 
+func TestApplyCollapsesExactDuplicatesKeepingFirstOccurrence(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/exact_duplicates.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	optimized := Apply(string(data))
+
+	if strings.Count(optimized, "Always respond in JSON format.") != 1 {
+		t.Errorf("expected exactly 1 occurrence of the collapsed line, got:\n%s", optimized)
+	}
+
+	report := Run(optimized, "")
+	if len(report.Duplicates) != 0 {
+		t.Errorf("expected Apply's output to have no remaining exact duplicates, got %+v", report.Duplicates)
+	}
+}
+
+func TestApplyLeavesNearDuplicatesUntouched(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/near_duplicates.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	optimized := Apply(string(data))
+
+	if optimized != string(data) {
+		t.Errorf("expected near-duplicates to be left for user review, but Apply changed the prompt:\n%s", optimized)
+	}
+}
+
 func TestRunReportsUnknownModel(t *testing.T) {
 	data, err := os.ReadFile("../../testdata/prompts/example.txt")
 	if err != nil {

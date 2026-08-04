@@ -46,6 +46,19 @@ This guards against over-optimization — e.g. collapsing "Always answer
 in JSON. Do not include markdown. Do not explain." down to "Return JSON."
 which silently drops constraints.
 
+Tasks:
+- [x] internal/lint: `Apply` — deterministic optimizer that actually
+      produces the optimized prompt text, currently limited to the
+      high-confidence exact-duplicate tier (near-duplicates and any
+      future semantic rewrites require review, per Milestone 3's
+      confidence-tier design)
+- [x] internal/regression: harness of (prompt, constraints-that-must-survive)
+      pairs, run against `Apply`
+- [x] regression cases covering: exact-duplicate collapse, near-duplicates
+      left untouched, history/question preserved verbatim, textually
+      distinct phrasing of the same instruction left untouched
+- [ ] wire the regression suite into CI once one exists
+
 ## Milestone 3 — Semantic compression (optional AI pass)
 
 - Local model backends: Ollama, llama.cpp, local GGUF

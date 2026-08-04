@@ -119,6 +119,38 @@ func DiffForDuplicate(d dedupe.Duplicate) string {
 	return diff.Render(diff.Lines(d.Lines, []string{d.Keep}))
 }
 
+// Apply returns prompt with exact-duplicate lines collapsed down to
+// their first occurrence — the only tier of optimization considered
+// safe to auto-apply without review (dedupe.Duplicate.Confidence == 1.0;
+// see the confidence-tier design in docs/roadmap.md's Milestone 3
+// section). Near-duplicates and any future semantic rewrites are left
+// untouched, since folding those in automatically risks silently
+// dropping a constraint the original prompt required — see
+// internal/regression for the test suite guarding against that.
+func Apply(prompt string) string {
+	lines := strings.Split(prompt, "\n")
+	dupes := dedupe.FindExact(lines)
+
+	drop := make(map[string]bool, len(dupes))
+	for _, d := range dupes {
+		drop[strings.ToLower(d.Keep)] = true
+	}
+
+	kept := map[string]bool{}
+	out := make([]string, 0, len(lines))
+	for _, line := range lines {
+		key := strings.ToLower(strings.TrimSpace(line))
+		if drop[key] {
+			if kept[key] {
+				continue
+			}
+			kept[key] = true
+		}
+		out = append(out, line)
+	}
+	return strings.Join(out, "\n")
+}
+
 // Print writes a human-readable report to w, in the style sketched out
 // in docs/roadmap.md.
 func (r Report) Print(w io.Writer) {
