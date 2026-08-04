@@ -10,8 +10,9 @@ Think "ESLint for prompts."
 
 ## Status
 
-Early scaffolding. Building the v1 CLI linter first (see `docs/roadmap.md`).
-No AI-powered features yet — v1 is fully deterministic and rule-based.
+v1 (deterministic linter) and the regression harness are done. Now building
+out Milestone 3's confidence-scored optimizations — see `docs/roadmap.md`.
+Still no AI calls anywhere; everything is rule-based.
 
 ## Project layout
 
@@ -31,21 +32,18 @@ docs/               Design notes, roadmap
 
 ## v1 goal: Prompt Linter (no AI required)
 
-- [ ] Token counter
-- [ ] Duplicate instruction detector
-- [ ] Repeated example detector
+- [x] Token counter
+- [x] Duplicate instruction detector
+- [x] Repeated example detector
 - [x] History length flagger
-- [ ] Cost estimator
-- [ ] Before/after diff view
-- [ ] CLI: `distilly-lint <file>` prints a lint report
+- [x] Cost estimator
+- [x] Before/after diff view
+- [x] CLI: `distilly-lint <file>` prints a lint report
 
 ## Later: v2+
 
-- Semantic compression via local models (Ollama / llama.cpp / GGUF)
-- Rule-based fallback for users without a GPU
+- Semantic compression via local models (Ollama / llama.cpp / GGUF) — deferred for now
 - Code context optimizer (relevant-file selection for repo-aware prompts)
-- Automatic JSON conversion for structured data
-- Confidence-scored optimizations (auto-apply high confidence, prompt for review on low confidence)
 - Desktop app (Wails) acting as a local proxy between apps and OpenAI/Claude/etc.
 
 ## Tech stack
@@ -67,6 +65,14 @@ go run ./cmd/lint testdata/prompts/example.txt
 # the kind that show up when a prompt template re-includes the system
 # instructions before every few-shot example. v1 catches these.
 go run ./cmd/lint testdata/prompts/exact_duplicates.txt
+
+# -fix prints the optimized prompt instead of the report. By default it
+# only touches the high-confidence tier (exact duplicate lines/examples).
+go run ./cmd/lint -fix testdata/prompts/exact_duplicates.txt
+
+# Lower-confidence tiers (near-duplicates, JSON conversion) need explicit
+# approval — review the report's diff first, then opt in:
+go run ./cmd/lint -fix -approve-near-duplicates -approve-json-conversion testdata/prompts/near_duplicates.txt
 ```
 
 Run the test suite with:

@@ -67,4 +67,14 @@ var Cases = []Case{
 			`A: {"answer": "Paris"}`,
 		},
 	},
+	{
+		Name:       "structured data: JSON conversion is a format change, not just a length one, so it must not happen without approval",
+		PromptFile: "structured_data.txt",
+		MustSurvive: []string{
+			"Name: John Smith",
+			"Age: 30",
+			"City: New York",
+			"Occupation: Software Engineer",
+		},
+	},
 }

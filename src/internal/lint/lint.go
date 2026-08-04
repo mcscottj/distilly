@@ -35,6 +35,13 @@ type Report struct {
 	DuplicateExamples     []dedupe.Duplicate
 	NearDuplicateExamples []dedupe.Duplicate
 
+	// StructuredData lists runs of prose "Key: value" lines in the
+	// System section that read as structured data and could be written
+	// far more densely as JSON (see FindStructuredData). Like
+	// near-duplicates, this is never auto-applied — see
+	// ApplyOptions.ApproveJSONConversion.
+	StructuredData []StructuredBlock
+
 	Suggestions      []string
 	PotentialSavings float64 // fraction, e.g. 0.46 for 46%
 
@@ -74,6 +81,11 @@ func Run(prompt, model string) Report {
 	dupeExamples := dedupe.FindExact(exampleBodies)
 	nearDupeExamples := dedupe.FindNear(exampleBodies, dedupe.DefaultExampleNearThreshold)
 
+	// Scoped to the System section for the same reason near-duplicate
+	// line detection is: Examples/History both contain turn-based
+	// "Label: text" runs that look like structured data but aren't.
+	structuredData := FindStructuredData(strings.Split(sections.System, "\n"))
+
 	var suggestions []string
 	savedTokens := 0
 
@@ -102,6 +114,10 @@ func Run(prompt, model string) Report {
 
 	if len(nearDupeExamples) > 0 {
 		suggestions = append(suggestions, "Review near-duplicate examples")
+	}
+
+	if len(structuredData) > 0 {
+		suggestions = append(suggestions, "Convert structured data to JSON")
 	}
 
 	if history.Flag(turns) {
@@ -135,6 +151,7 @@ func Run(prompt, model string) Report {
 		NearDuplicates:        nearDupes,
 		DuplicateExamples:     dupeExamples,
 		NearDuplicateExamples: nearDupeExamples,
+		StructuredData:        structuredData,
 		Suggestions:           suggestions,
 		PotentialSavings:      savings,
 		Model:                 model,
@@ -164,6 +181,13 @@ type ApplyOptions struct {
 	// approval risks the over-optimization internal/regression guards
 	// against.
 	ApproveNearDuplicates bool
+
+	// ApproveJSONConversion opts in to rewriting detected structured-data
+	// runs (see FindStructuredData) into a single compact JSON line. Off
+	// by default: this changes the prompt's format, not just its length,
+	// so it needs a human to confirm the model consuming the prompt
+	// actually expects/tolerates that.
+	ApproveJSONConversion bool
 }
 
 // Apply returns prompt with exact-duplicate lines collapsed down to
@@ -235,7 +259,17 @@ func Apply(prompt string, opts ApplyOptions) string {
 		}
 	}
 
-	return removeExampleBlocks(prompt, dropExactBody, removeNearBody)
+	prompt = removeExampleBlocks(prompt, dropExactBody, removeNearBody)
+
+	if opts.ApproveJSONConversion {
+		sections := SplitSections(prompt)
+		for _, b := range FindStructuredData(strings.Split(sections.System, "\n")) {
+			rawText := strings.Join(b.Raw, "\n")
+			prompt = strings.Replace(prompt, rawText, b.JSON(), 1)
+		}
+	}
+
+	return prompt
 }
 
 // Print writes a human-readable report to w, in the style sketched out
@@ -312,6 +346,21 @@ func (r Report) Print(w io.Writer) {
 		fmt.Fprintln(w, "-------------------------------------------")
 		for _, d := range r.NearDuplicateExamples {
 			fmt.Fprint(w, DiffForDuplicate(d))
+		}
+		fmt.Fprintln(w)
+	}
+
+	if len(r.StructuredData) > 0 {
+		fmt.Fprintln(w, "Structured Data (review before converting)")
+		fmt.Fprintln(w, "-------------------------------------------")
+		for _, b := range r.StructuredData {
+			fmt.Fprintf(w, "%d key/value lines -> %s\n\n", len(b.Keys), b.JSON())
+		}
+
+		fmt.Fprintln(w, "Suggested Diff (not applied automatically)")
+		fmt.Fprintln(w, "-------------------------------------------")
+		for _, b := range r.StructuredData {
+			fmt.Fprint(w, diff.Render(diff.Lines(b.Raw, []string{b.JSON()})))
 		}
 		fmt.Fprintln(w)
 	}

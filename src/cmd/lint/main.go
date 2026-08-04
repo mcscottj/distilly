@@ -14,10 +14,11 @@ import (
 
 func main() {
 	model := flag.String("model", "", "model name to estimate USD cost against (see internal/cost.Table)")
-	fix := flag.Bool("fix", false, "print the optimized prompt instead of the lint report (exact duplicates only, unless -approve-near-duplicates is set)")
-	approveNearDuplicates := flag.Bool("approve-near-duplicates", false, "with -fix, also collapse near-duplicate instructions — review the report's near-duplicate diff first")
+	fix := flag.Bool("fix", false, "print the optimized prompt instead of the lint report (exact duplicates only, unless -approve-near-duplicates/-approve-json-conversion are set)")
+	approveNearDuplicates := flag.Bool("approve-near-duplicates", false, "with -fix, also collapse near-duplicate instructions/examples — review the report's near-duplicate diff first")
+	approveJSONConversion := flag.Bool("approve-json-conversion", false, "with -fix, also convert detected structured-data lines to JSON — review the report's structured-data diff first")
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: distilly-lint [-model gpt-4] [-fix [-approve-near-duplicates]] <prompt-file>")
+		fmt.Fprintln(os.Stderr, "usage: distilly-lint [-model gpt-4] [-fix [-approve-near-duplicates] [-approve-json-conversion]] <prompt-file>")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -35,7 +36,10 @@ func main() {
 	}
 
 	if *fix {
-		optimized := lint.Apply(string(data), lint.ApplyOptions{ApproveNearDuplicates: *approveNearDuplicates})
+		optimized := lint.Apply(string(data), lint.ApplyOptions{
+			ApproveNearDuplicates: *approveNearDuplicates,
+			ApproveJSONConversion: *approveJSONConversion,
+		})
 		fmt.Print(optimized)
 		return
 	}

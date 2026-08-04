@@ -85,7 +85,14 @@ Tasks:
       corrupt a legitimately-different example that happened to share one
       identical line with another (see `nonExampleLines` in
       `internal/lint/examples.go`)
-- [ ] automatic JSON conversion for structured data
+- [x] internal/lint: automatic JSON conversion for structured data —
+      `FindStructuredData` flags runs of >= 3 consecutive prose "Key: value"
+      lines in the System section, `StructuredBlock.JSON` renders them as a
+      single compact JSON object, and `Apply` rewrites them once
+      `ApplyOptions.ApproveJSONConversion` is set (never automatic — this
+      changes the prompt's format, not just its length)
+- [ ] rule-based fallback for users without a GPU — n/a while local model
+      backends are deferred; nothing to fall back from yet
 
 ## Milestone 4 — Desktop app
 
