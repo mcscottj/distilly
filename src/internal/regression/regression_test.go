@@ -17,7 +17,7 @@ func TestOptimizationPreservesConstraints(t *testing.T) {
 				t.Fatalf("reading %s: %v", c.PromptFile, err)
 			}
 
-			optimized := lint.Apply(string(data))
+			optimized := lint.Apply(string(data), lint.ApplyOptions{})
 
 			for _, constraint := range c.MustSurvive {
 				if !strings.Contains(optimized, constraint) {
@@ -40,8 +40,8 @@ func TestApplyIsIdempotent(t *testing.T) {
 				t.Fatalf("reading %s: %v", c.PromptFile, err)
 			}
 
-			once := lint.Apply(string(data))
-			twice := lint.Apply(once)
+			once := lint.Apply(string(data), lint.ApplyOptions{})
+			twice := lint.Apply(once, lint.ApplyOptions{})
 
 			if once != twice {
 				t.Errorf("Apply is not idempotent:\n--- first pass ---\n%s\n--- second pass ---\n%s", once, twice)

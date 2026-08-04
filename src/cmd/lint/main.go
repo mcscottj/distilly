@@ -14,8 +14,10 @@ import (
 
 func main() {
 	model := flag.String("model", "", "model name to estimate USD cost against (see internal/cost.Table)")
+	fix := flag.Bool("fix", false, "print the optimized prompt instead of the lint report (exact duplicates only, unless -approve-near-duplicates is set)")
+	approveNearDuplicates := flag.Bool("approve-near-duplicates", false, "with -fix, also collapse near-duplicate instructions — review the report's near-duplicate diff first")
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: distilly-lint [-model gpt-4] <prompt-file>")
+		fmt.Fprintln(os.Stderr, "usage: distilly-lint [-model gpt-4] [-fix [-approve-near-duplicates]] <prompt-file>")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -30,6 +32,12 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error reading %s: %v\n", path, err)
 		os.Exit(1)
+	}
+
+	if *fix {
+		optimized := lint.Apply(string(data), lint.ApplyOptions{ApproveNearDuplicates: *approveNearDuplicates})
+		fmt.Print(optimized)
+		return
 	}
 
 	report := lint.Run(string(data), *model)

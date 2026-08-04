@@ -119,28 +119,58 @@ func DiffForDuplicate(d dedupe.Duplicate) string {
 	return diff.Render(diff.Lines(d.Lines, []string{d.Keep}))
 }
 
+// ApplyOptions gates the lower-confidence optimization tiers behind
+// explicit user approval. The zero value applies only the tier that's
+// always safe: exact-duplicate collapse.
+type ApplyOptions struct {
+	// ApproveNearDuplicates opts in to collapsing near-duplicate lines
+	// in the System section (dedupe.Duplicate.Confidence < 1.0) down to
+	// each group's Keep line. Off by default: near-duplicates are a
+	// cosmetic-similarity guess, not a proven-identical match, so
+	// collapsing them without explicit approval risks the
+	// over-optimization internal/regression guards against.
+	ApproveNearDuplicates bool
+}
+
 // Apply returns prompt with exact-duplicate lines collapsed down to
 // their first occurrence — the only tier of optimization considered
 // safe to auto-apply without review (dedupe.Duplicate.Confidence == 1.0;
 // see the confidence-tier design in docs/roadmap.md's Milestone 3
-// section). Near-duplicates and any future semantic rewrites are left
-// untouched, since folding those in automatically risks silently
-// dropping a constraint the original prompt required — see
-// internal/regression for the test suite guarding against that.
-func Apply(prompt string) string {
+// section). Set opts.ApproveNearDuplicates to also fold in near-duplicate
+// lines once a user has reviewed the report's near-duplicate diff.
+func Apply(prompt string, opts ApplyOptions) string {
 	lines := strings.Split(prompt, "\n")
 	dupes := dedupe.FindExact(lines)
 
-	drop := make(map[string]bool, len(dupes))
+	dropKey := make(map[string]bool, len(dupes))
 	for _, d := range dupes {
-		drop[strings.ToLower(d.Keep)] = true
+		dropKey[strings.ToLower(d.Keep)] = true
+	}
+
+	// Near-duplicate groups don't share a single normalized key the way
+	// exact-duplicate groups do (that's the point — they're lexically
+	// distinct), so track the individual lines to remove instead.
+	removeLine := map[string]bool{}
+	if opts.ApproveNearDuplicates {
+		sections := SplitSections(prompt)
+		for _, d := range dedupe.FindNear(strings.Split(sections.System, "\n"), dedupe.DefaultNearThreshold) {
+			keepKey := strings.ToLower(strings.TrimSpace(d.Keep))
+			for _, l := range d.Lines {
+				if key := strings.ToLower(strings.TrimSpace(l)); key != keepKey {
+					removeLine[key] = true
+				}
+			}
+		}
 	}
 
 	kept := map[string]bool{}
 	out := make([]string, 0, len(lines))
 	for _, line := range lines {
 		key := strings.ToLower(strings.TrimSpace(line))
-		if drop[key] {
+		if removeLine[key] {
+			continue
+		}
+		if dropKey[key] {
 			if kept[key] {
 				continue
 			}

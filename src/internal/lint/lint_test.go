@@ -158,7 +158,7 @@ func TestApplyCollapsesExactDuplicatesKeepingFirstOccurrence(t *testing.T) {
 		t.Fatalf("reading testdata: %v", err)
 	}
 
-	optimized := Apply(string(data))
+	optimized := Apply(string(data), ApplyOptions{})
 
 	if strings.Count(optimized, "Always respond in JSON format.") != 1 {
 		t.Errorf("expected exactly 1 occurrence of the collapsed line, got:\n%s", optimized)
@@ -176,10 +176,32 @@ func TestApplyLeavesNearDuplicatesUntouched(t *testing.T) {
 		t.Fatalf("reading testdata: %v", err)
 	}
 
-	optimized := Apply(string(data))
+	optimized := Apply(string(data), ApplyOptions{})
 
 	if optimized != string(data) {
 		t.Errorf("expected near-duplicates to be left for user review, but Apply changed the prompt:\n%s", optimized)
+	}
+}
+
+func TestApplyCollapsesNearDuplicatesWhenApproved(t *testing.T) {
+	data, err := os.ReadFile("../../testdata/prompts/near_duplicates.txt")
+	if err != nil {
+		t.Fatalf("reading testdata: %v", err)
+	}
+
+	optimized := Apply(string(data), ApplyOptions{ApproveNearDuplicates: true})
+
+	report := Run(optimized, "")
+	if len(report.NearDuplicates) != 0 {
+		t.Errorf("expected approved near-duplicates to be collapsed, got %+v", report.NearDuplicates)
+	}
+
+	// Each group's Keep line (the longest variant) must still be present.
+	if !strings.Contains(optimized, "Please always respond in JSON format.") {
+		t.Errorf("expected the kept variant of the JSON group to survive, got:\n%s", optimized)
+	}
+	if !strings.Contains(optimized, "Do not explain your reasoning, just answer.") {
+		t.Errorf("expected the kept variant of the reasoning group to survive, got:\n%s", optimized)
 	}
 }
 

@@ -61,13 +61,23 @@ Tasks:
 
 ## Milestone 3 — Semantic compression (optional AI pass)
 
-- Local model backends: Ollama, llama.cpp, local GGUF
+- ~~Local model backends: Ollama, llama.cpp, local GGUF~~ (deferred — not
+  being built right now)
 - Rule-based fallback for users without a GPU
 - Every optimization gets a confidence score
   - High confidence (exact duplicates) -> auto-applied
   - Low confidence (semantic rewrites) -> requires user approval
 - Example deduplication via clustering
 - Automatic JSON conversion for structured data
+
+Tasks:
+- [x] internal/lint: `ApplyOptions.ApproveNearDuplicates` — near-duplicate
+      lines (low confidence) collapse only when explicitly approved;
+      exact duplicates (high confidence) keep auto-applying as before
+- [x] cmd/lint: `-fix` prints the optimized prompt; `-approve-near-duplicates`
+      opts in to the low-confidence tier
+- [ ] internal/dedupe: example deduplication via clustering
+- [ ] automatic JSON conversion for structured data
 
 ## Milestone 4 — Desktop app
 
