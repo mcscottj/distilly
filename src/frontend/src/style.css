@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+:root {
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  color: #e8eef5;
+  background: #0f1720;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at top left, #1a2a3a 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, #152028 0%, transparent 45%),
+    #0f1720;
+}
