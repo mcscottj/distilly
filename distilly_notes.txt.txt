@@ -1,0 +1,16 @@
+8/10/26
+
+
+To test and run:
+
+	•	`go test ./...` passes
+	•	`npm run build` succeeds
+	•	`wails build` produced src/build/bin/distilly.app
+
+Run locally with 
+
+`cd src && wails dev` 
+
+(Wails CLI is at ~/go/bin/wails)
+
+
