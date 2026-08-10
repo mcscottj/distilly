@@ -12,7 +12,7 @@ const navItems: { id: Page; label: string }[] = [
 function App() {
   const [page, setPage] = useState<Page>('lint')
   const [name, setName] = useState('')
-  const [greeting, setGreeting] = useState('Wails scaffold ready.')
+  const [greeting, setGreeting] = useState('Wails scaffold ready, yo.')
 
   async function onGreet(e: FormEvent) {
     e.preventDefault()

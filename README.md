@@ -1,3 +1,5 @@
+![Distilly logo](docs/distilly-logo.png)
+
 # distilly
 
 A local-first prompt linter and optimizer for developers who use LLM APIs
