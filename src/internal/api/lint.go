@@ -23,6 +23,7 @@ func ListModels() []string {
 // Analyze runs the lint engine and maps the report into AnalyzeResponse.
 func Analyze(req AnalyzeRequest) AnalyzeResponse {
 	r := lint.Run(req.Prompt, req.Model)
+	scored := lint.Score(r)
 	return AnalyzeResponse{
 		InputTokens:           r.InputTokens,
 		Sections:              SectionBreakdown(r.Sections),
@@ -37,6 +38,8 @@ func Analyze(req AnalyzeRequest) AnalyzeResponse {
 		CostKnown:             r.CostKnown,
 		EstimatedCostUSD:      r.EstimatedCostUSD,
 		EstimatedSavingsUSD:   r.EstimatedSavingsUSD,
+		Score:                 scored.Score,
+		Issues:                scored.Issues,
 	}
 }
 

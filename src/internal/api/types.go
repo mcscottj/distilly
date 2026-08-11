@@ -10,7 +10,7 @@ type AnalyzeRequest struct {
 }
 
 // AnalyzeResponse mirrors lint.Report as stable, serializable fields for
-// the desktop UI. Score/Issues are reserved for the prompt-scoring layer.
+// the desktop UI, plus Score/Issues from lint.Score.
 type AnalyzeResponse struct {
 	InputTokens           int                   `json:"inputTokens"`
 	Sections              SectionBreakdown      `json:"sections"`
@@ -27,7 +27,7 @@ type AnalyzeResponse struct {
 	EstimatedSavingsUSD   float64               `json:"estimatedSavingsUsd"`
 
 	// Score is 0–100 prompt quality; Issues lists human-readable
-	// deductions. Populated once lint.Score is wired.
+	// deductions from lint.Score.
 	Score  int      `json:"score"`
 	Issues []string `json:"issues"`
 }

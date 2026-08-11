@@ -70,6 +70,25 @@ func TestAnalyzeMapsReportFields(t *testing.T) {
 		resp.Sections.History == 0 && resp.Sections.Question == 0 {
 		t.Error("expected non-zero section breakdown")
 	}
+	if resp.Score >= 100 {
+		t.Errorf("Score = %d, want < 100 for exact-duplicates fixture", resp.Score)
+	}
+	if len(resp.Issues) == 0 {
+		t.Fatal("expected Issues for exact-duplicates fixture")
+	}
+}
+
+func TestAnalyzeExposesPerfectScoreForCleanPrompt(t *testing.T) {
+	resp := Analyze(AnalyzeRequest{
+		Prompt: "System:\nYou are a helpful assistant.\n\nQuestion:\nWhat is 2+2?\n",
+		Model:  "gpt-4",
+	})
+	if resp.Score != 100 {
+		t.Errorf("Score = %d, want 100", resp.Score)
+	}
+	if len(resp.Issues) != 0 {
+		t.Errorf("Issues = %v, want empty", resp.Issues)
+	}
 }
 
 func TestAnalyzeIncludesNearDuplicatesAndStructuredData(t *testing.T) {
