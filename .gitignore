@@ -11,3 +11,4 @@ src/frontend/vite.config.js
 src/frontend/vite.config.d.ts
 src/build/bin
 .worktrees
+distilly_notes.txt
