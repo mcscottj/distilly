@@ -320,3 +320,22 @@ export namespace store {
 
 }
 
+export namespace proxy {
+	
+	export class Status {
+	    running: boolean;
+	    addr: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Status(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.running = source["running"];
+	        this.addr = source["addr"];
+	    }
+	}
+
+}
+

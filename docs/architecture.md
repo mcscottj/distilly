@@ -99,13 +99,13 @@ sequenceDiagram
 
 **In plain terms:** Your code talks to Distilly as if it were OpenAI. Distilly turns chat messages into a sectioned prompt, cleans it up, turns it back into messages, logs savings, and forwards the slimmed request to the real API. Streaming is rejected today. Native Anthropic Messages API is out of scope for M4 — Claude works only via OpenAI-compatible gateways.
 
-**Current gap:** Proxy package exists and is tested, but `StartProxy` / `StopProxy` are not yet wired on [`src/app.go`](../src/app.go); Settings shows the base URL without start/stop controls.
+Start and stop the proxy from **Settings** (`StartProxy` / `StopProxy` / `GetProxyStatus` on [`src/app.go`](../src/app.go)).
 
 ## Desktop UI surface
 
 - **Lint workspace** — editor, model picker, score, sections, suggestions, apply + diff
 - **Dashboard** — aggregate tokens/$ saved, recent requests (mainly from proxy logs)
-- **Settings** — upstream URL, API key, proxy port, approval toggles, passthrough
+- **Settings** — upstream URL, API key, proxy port, start/stop/status, approval toggles, passthrough
 
 Data lives in SQLite under the user config dir (`…/distilly/distilly.db`).
 
@@ -114,5 +114,5 @@ Data lives in SQLite under the user config dir (`…/distilly/distilly.db`).
 See also [`roadmap.md`](roadmap.md).
 
 - **M1–M3:** CLI lint, regression harness, confidence-tier apply — largely done
-- **M4:** Desktop app + SQLite + proxy — mostly built; proxy lifecycle wiring incomplete
+- **M4:** Desktop app + SQLite + proxy lifecycle — done
 - **M5 (future):** code-context / Tree-sitter file selection

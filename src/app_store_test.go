@@ -80,4 +80,11 @@ func TestAppBindingsWithoutStore(t *testing.T) {
 	if err := app.LogRequest(store.Request{Source: store.SourceManual}); err == nil {
 		t.Fatal("expected error when store is nil")
 	}
+	if err := app.StartProxy(); err == nil {
+		t.Fatal("expected error when store is nil")
+	}
+	st := app.GetProxyStatus()
+	if st.Running {
+		t.Fatalf("status = %+v, want not running", st)
+	}
 }
