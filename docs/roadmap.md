@@ -96,10 +96,14 @@ Tasks:
 
 ## Milestone 4 — Desktop app
 
-- Wails-based desktop app wrapping the same Go engine
-- Acts as a local proxy between apps and OpenAI/Claude/etc.
-- React + Vite + Tailwind frontend
-- Prompt scoring UI, side-by-side diff, cost estimator dashboard
+- [x] Wails-based desktop app wrapping the same Go engine
+- [x] React + Vite + Tailwind frontend (Lint workspace, Dashboard, Settings)
+- [x] Prompt scoring UI, side-by-side diff, cost estimator dashboard
+- [x] SQLite store for settings + request metrics
+- [x] OpenAI-compatible local proxy package (`POST /v1/chat/completions`,
+      non-streaming) with unit tests
+- [ ] Wire `StartProxy` / `StopProxy` (and status) on `app.go` + Settings UI
+      so the proxy is startable from the desktop app
 
 ## Milestone 5 — Code context optimizer
 
