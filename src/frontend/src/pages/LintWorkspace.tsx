@@ -1,11 +1,21 @@
 import { FormEvent, useEffect, useState } from 'react'
+import { GetSetting } from '../../wailsjs/go/main/App'
 import { DiffView } from '../components/DiffView'
 import { ScoreCard } from '../components/ScoreCard'
 import { SectionBreakdown } from '../components/SectionBreakdown'
 import { SuggestionList } from '../components/SuggestionList'
 import { ApplyToggles, useAnalyze } from '../hooks/useAnalyze'
+import { SettingKey, parseBoolSetting } from '../lib/settings'
 
-export function LintWorkspace() {
+type LintWorkspaceProps = {
+  preferredModel?: string
+  onPreferredModelConsumed?: () => void
+}
+
+export function LintWorkspace({
+  preferredModel,
+  onPreferredModelConsumed,
+}: LintWorkspaceProps) {
   const {
     models,
     analysis,
@@ -20,17 +30,52 @@ export function LintWorkspace() {
 
   const [prompt, setPrompt] = useState('')
   const [model, setModel] = useState('')
+  const [defaultModel, setDefaultModel] = useState('')
   const [toggles, setToggles] = useState<ApplyToggles>({
     approveNearDuplicates: false,
     approveJsonConversion: false,
   })
+  const [prefsLoaded, setPrefsLoaded] = useState(false)
 
   useEffect(() => {
-    if (!model && models.length > 0) {
+    let cancelled = false
+    Promise.all([
+      GetSetting(SettingKey.DefaultModel),
+      GetSetting(SettingKey.ApproveNearDuplicates),
+      GetSetting(SettingKey.ApproveJsonConversion),
+    ])
+      .then(([savedModel, near, json]) => {
+        if (cancelled) return
+        setDefaultModel(savedModel ?? '')
+        setToggles({
+          approveNearDuplicates: parseBoolSetting(near),
+          approveJsonConversion: parseBoolSetting(json),
+        })
+        setPrefsLoaded(true)
+      })
+      .catch(() => {
+        if (!cancelled) setPrefsLoaded(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (preferredModel) {
+      setModel(preferredModel)
+      onPreferredModelConsumed?.()
+      return
+    }
+    if (!prefsLoaded || model) return
+    if (defaultModel && (models.length === 0 || models.includes(defaultModel))) {
+      setModel(defaultModel)
+      return
+    }
+    if (models.length > 0) {
       setModel(models[0])
     }
-  }, [models, model])
-
+  }, [preferredModel, onPreferredModelConsumed, prefsLoaded, defaultModel, models, model])
   async function onAnalyze(e: FormEvent) {
     e.preventDefault()
     if (!prompt.trim()) return
@@ -73,7 +118,10 @@ export function LintWorkspace() {
               onChange={(e) => setModel(e.target.value)}
               className="rounded-md border border-white/15 bg-black/25 px-3 py-2 text-sm text-white outline-none focus:border-sky-400"
             >
-              {models.length === 0 && <option value="">Loading models…</option>}
+              {models.length === 0 && !model && <option value="">Loading models…</option>}
+              {model && !models.includes(model) && (
+                <option value={model}>{model}</option>
+              )}
               {models.map((m) => (
                 <option key={m} value={m}>
                   {m}
