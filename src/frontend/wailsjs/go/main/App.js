@@ -18,6 +18,10 @@ export function GetDashboardStats() {
   return window['go']['main']['App']['GetDashboardStats']();
 }
 
+export function GetProxyStatus() {
+  return window['go']['main']['App']['GetProxyStatus']();
+}
+
 export function GetRecentRequests(arg1) {
   return window['go']['main']['App']['GetRecentRequests'](arg1);
 }
@@ -40,4 +44,12 @@ export function LogRequest(arg1) {
 
 export function SetSetting(arg1, arg2) {
   return window['go']['main']['App']['SetSetting'](arg1, arg2);
+}
+
+export function StartProxy() {
+  return window['go']['main']['App']['StartProxy']();
+}
+
+export function StopProxy() {
+  return window['go']['main']['App']['StopProxy']();
 }

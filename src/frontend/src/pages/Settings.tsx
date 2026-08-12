@@ -1,9 +1,17 @@
 import { FormEvent, useState } from 'react'
+import { useProxyLifecycle } from '../hooks/useProxyLifecycle'
 import { useSettings } from '../hooks/useSettings'
 import { proxyBaseURL } from '../lib/settings'
 
 export function Settings() {
-  const { settings, models, loading, saving, error, savedAt, update, save } = useSettings()
+  const { settings, models, loading, saving, error, savedAt, update, save, setError } = useSettings()
+  const {
+    status: proxyStatus,
+    busy: proxyBusy,
+    error: proxyError,
+    start: startProxy,
+    stop: stopProxy,
+  } = useProxyLifecycle()
   const [copied, setCopied] = useState(false)
 
   async function onSubmit(e: FormEvent) {
@@ -23,7 +31,29 @@ export function Settings() {
     }
   }
 
+  async function onStartProxy() {
+    setError(null)
+    try {
+      // Persist port (and other fields) before binding so StartProxy reads SQLite.
+      await save()
+      await startProxy()
+    } catch {
+      // Errors are surfaced via useSettings / useProxyLifecycle state.
+    }
+  }
+
+  async function onStopProxy() {
+    setError(null)
+    try {
+      await stopProxy()
+    } catch {
+      // Error state set in hook.
+    }
+  }
+
   const baseURL = proxyBaseURL(settings.proxyPort)
+  const displayError = error ?? proxyError
+  const proxyRunning = proxyStatus.running
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
@@ -35,9 +65,9 @@ export function Settings() {
         </p>
       </div>
 
-      {error && (
+      {displayError && (
         <p className="rounded-md border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200">
-          {error}
+          {displayError}
         </p>
       )}
 
@@ -92,8 +122,45 @@ export function Settings() {
           </label>
         </fieldset>
 
-        <fieldset disabled={loading || saving} className="space-y-4">
+        <fieldset disabled={loading || saving || proxyBusy} className="space-y-4">
           <legend className="mb-1 text-sm font-medium text-white">Local proxy</legend>
+
+          <div className="flex flex-wrap items-center gap-3 rounded-lg border border-white/10 bg-black/15 px-3 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Status</p>
+              <p className="mt-0.5 text-sm text-slate-100">
+                {proxyRunning ? (
+                  <>
+                    Running
+                    {proxyStatus.addr ? (
+                      <span className="ml-2 font-mono text-sky-200">{proxyStatus.addr}</span>
+                    ) : null}
+                  </>
+                ) : (
+                  'Stopped'
+                )}
+              </p>
+            </div>
+            {proxyRunning ? (
+              <button
+                type="button"
+                onClick={() => void onStopProxy()}
+                disabled={proxyBusy}
+                className="rounded-md border border-white/20 px-3 py-1.5 text-sm text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {proxyBusy ? 'Stopping…' : 'Stop proxy'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void onStartProxy()}
+                disabled={proxyBusy || loading || saving}
+                className="rounded-md bg-sky-500 px-3 py-1.5 text-sm font-medium text-slate-950 hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {proxyBusy || saving ? 'Starting…' : 'Start proxy'}
+              </button>
+            )}
+          </div>
 
           <label className="flex flex-col gap-1.5 text-sm">
             <span className="text-slate-400">Proxy port</span>
@@ -104,8 +171,12 @@ export function Settings() {
               value={settings.proxyPort}
               onChange={(e) => update('proxyPort', e.target.value.replace(/[^\d]/g, ''))}
               placeholder="8787"
-              className="w-40 rounded-md border border-white/15 bg-black/25 px-3 py-2 text-sm text-white outline-none focus:border-sky-400"
+              disabled={proxyRunning}
+              className="w-40 rounded-md border border-white/15 bg-black/25 px-3 py-2 text-sm text-white outline-none focus:border-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
             />
+            {proxyRunning && (
+              <span className="text-xs text-slate-500">Stop the proxy to change the port.</span>
+            )}
           </label>
 
           <div className="flex flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-black/15 px-3 py-3">

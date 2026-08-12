@@ -44,5 +44,5 @@ SQLite at user config `…/distilly/distilly.db`:
 ## Desktop binding pattern
 
 `src/app.go` exposes methods to React via Wails. Store opens on startup /
-closes on shutdown. Proxy **package** is separate; lifecycle is not yet bound
-on `App`.
+closes on shutdown. Proxy lifecycle (`StartProxy` / `StopProxy` /
+`GetProxyStatus`) is bound on `App`; Settings UI starts/stops the listener.

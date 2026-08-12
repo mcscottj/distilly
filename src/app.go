@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"distilly/internal/api"
+	"distilly/internal/proxy"
 	"distilly/internal/store"
 )
 
@@ -14,6 +16,9 @@ import (
 type App struct {
 	ctx   context.Context
 	store *store.Store
+
+	proxyMu sync.Mutex
+	proxy   *proxy.Server
 }
 
 // NewApp creates a new App application struct.
@@ -38,8 +43,11 @@ func (a *App) startup(ctx context.Context) {
 	a.store = s
 }
 
-// shutdown closes the SQLite store.
+// shutdown stops the proxy and closes the SQLite store.
 func (a *App) shutdown(ctx context.Context) {
+	if err := a.StopProxy(); err != nil {
+		fmt.Fprintf(os.Stderr, "distilly: stop proxy: %v\n", err)
+	}
 	if a.store != nil {
 		if err := a.store.Close(); err != nil {
 			fmt.Fprintf(os.Stderr, "distilly: close store: %v\n", err)

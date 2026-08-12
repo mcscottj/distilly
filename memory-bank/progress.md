@@ -15,7 +15,7 @@ Last updated: 2026-08-12
 - [x] CLI `distilly-lint` (`-model`, `-fix`, approval flags)
 - [x] Regression harness (`internal/regression` + `testdata/prompts`)
 
-### Milestone 4 (mostly)
+### Milestone 4
 
 - [x] Wails scaffold + React Lint / Dashboard / Settings
 - [x] `internal/api` DTOs; App bindings: Analyze, Apply, DiffForDuplicate,
@@ -23,10 +23,11 @@ Last updated: 2026-08-12
 - [x] SQLite store (requests + settings)
 - [x] OpenAI-compatible proxy package + unit tests (httptest upstream,
       stream rejection, savings logging)
+- [x] Wire `StartProxy` / `StopProxy` / `GetProxyStatus` on `app.go` and
+      Settings UI start/stop controls
 
 ## In progress / gaps
 
-- [ ] Wire `StartProxy` / `StopProxy` / status on `app.go` and Settings UI
 - [ ] Manual Lint UI does not call `LogRequest` (dashboard mainly proxy-fed)
 - [ ] Remove leftover `Greet` scaffold binding
 - [ ] Wire regression suite into CI (no CI yet)
