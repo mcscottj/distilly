@@ -3,13 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"distilly/internal/api"
+	"distilly/internal/store"
 )
 
 // App is the Wails-bound application struct.
 type App struct {
-	ctx context.Context
+	ctx   context.Context
+	store *store.Store
 }
 
 // NewApp creates a new App application struct.
@@ -21,6 +25,46 @@ func NewApp() *App {
 // call the runtime methods.
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	path, err := defaultDBPath()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "distilly: resolve db path: %v\n", err)
+		return
+	}
+	s, err := store.Open(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "distilly: open store %s: %v\n", path, err)
+		return
+	}
+	a.store = s
+}
+
+// shutdown closes the SQLite store.
+func (a *App) shutdown(ctx context.Context) {
+	if a.store != nil {
+		if err := a.store.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "distilly: close store: %v\n", err)
+		}
+		a.store = nil
+	}
+}
+
+func defaultDBPath() (string, error) {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return "", err
+	}
+	dir := filepath.Join(configDir, "distilly")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, "distilly.db"), nil
+}
+
+func (a *App) requireStore() (*store.Store, error) {
+	if a == nil || a.store == nil {
+		return nil, fmt.Errorf("store not available")
+	}
+	return a.store, nil
 }
 
 // Greet returns a greeting for the given name. Placeholder binding for the
@@ -48,4 +92,50 @@ func (a *App) Apply(req api.ApplyRequest) api.ApplyResponse {
 // DiffForDuplicate returns a structured diff for one duplicate group.
 func (a *App) DiffForDuplicate(d api.DuplicateGroup) []api.DiffLine {
 	return api.DiffForDuplicate(d)
+}
+
+// GetDashboardStats returns aggregate savings for the cost dashboard.
+func (a *App) GetDashboardStats() (store.DashboardStats, error) {
+	s, err := a.requireStore()
+	if err != nil {
+		return store.DashboardStats{ByModel: []store.ModelStats{}}, err
+	}
+	return s.GetDashboardStats()
+}
+
+// GetRecentRequests returns the newest logged requests for the dashboard.
+func (a *App) GetRecentRequests(limit int) ([]store.Request, error) {
+	s, err := a.requireStore()
+	if err != nil {
+		return nil, err
+	}
+	return s.GetRecentRequests(limit)
+}
+
+// GetSetting returns a settings value, or "" if unset.
+func (a *App) GetSetting(key string) (string, error) {
+	s, err := a.requireStore()
+	if err != nil {
+		return "", err
+	}
+	return s.GetSetting(key)
+}
+
+// SetSetting upserts a settings key/value pair.
+func (a *App) SetSetting(key, value string) error {
+	s, err := a.requireStore()
+	if err != nil {
+		return err
+	}
+	return s.SetSetting(key, value)
+}
+
+// LogRequest appends a request row (manual analyze or proxy).
+func (a *App) LogRequest(r store.Request) error {
+	s, err := a.requireStore()
+	if err != nil {
+		return err
+	}
+	_, err = s.InsertRequest(r)
+	return err
 }

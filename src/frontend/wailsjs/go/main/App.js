@@ -14,10 +14,30 @@ export function DiffForDuplicate(arg1) {
   return window['go']['main']['App']['DiffForDuplicate'](arg1);
 }
 
+export function GetDashboardStats() {
+  return window['go']['main']['App']['GetDashboardStats']();
+}
+
+export function GetRecentRequests(arg1) {
+  return window['go']['main']['App']['GetRecentRequests'](arg1);
+}
+
+export function GetSetting(arg1) {
+  return window['go']['main']['App']['GetSetting'](arg1);
+}
+
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
 
 export function ListModels() {
   return window['go']['main']['App']['ListModels']();
+}
+
+export function LogRequest(arg1) {
+  return window['go']['main']['App']['LogRequest'](arg1);
+}
+
+export function SetSetting(arg1, arg2) {
+  return window['go']['main']['App']['SetSetting'](arg1, arg2);
 }
