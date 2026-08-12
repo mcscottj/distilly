@@ -29,13 +29,24 @@ const (
 	DefaultUpstreamURL           = "https://api.openai.com"
 )
 
+// DefaultListenHost is the loopback host used when starting from the desktop app.
+const DefaultListenHost = "127.0.0.1"
+
+// Status reports whether the local proxy is listening and on which address.
+type Status struct {
+	Running bool   `json:"running"`
+	Addr    string `json:"addr"`
+}
+
 // Server is an OpenAI-compatible proxy that optimizes chat prompts.
 type Server struct {
 	store  *store.Store
 	client *http.Client
 
-	mu     sync.Mutex
-	server *http.Server
+	mu      sync.Mutex
+	server  *http.Server
+	addr    string
+	running bool
 }
 
 // New returns a proxy Server that reads settings and logs via s.
@@ -55,22 +66,77 @@ func (s *Server) Handler() http.Handler {
 	return mux
 }
 
-// ListenAndServe starts the proxy on addr (e.g. "127.0.0.1:8787").
-func (s *Server) ListenAndServe(addr string) error {
+// Start binds addr and serves in the background. Returns once listening
+// succeeds (or fails to bind). Calling Start while already running is an error.
+func (s *Server) Start(addr string) error {
+	s.mu.Lock()
+	if s.running {
+		cur := s.addr
+		s.mu.Unlock()
+		return fmt.Errorf("proxy already running on %s", cur)
+	}
+
 	srv := &http.Server{
 		Addr:              addr,
 		Handler:           s.Handler(),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
-	s.mu.Lock()
-	s.server = srv
-	s.mu.Unlock()
-
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
+		s.mu.Unlock()
 		return err
 	}
-	return srv.Serve(ln)
+	// Prefer the concrete bound address (handles ":0" in tests).
+	bound := ln.Addr().String()
+	s.server = srv
+	s.addr = bound
+	s.running = true
+	s.mu.Unlock()
+
+	go func() {
+		err := srv.Serve(ln)
+		s.mu.Lock()
+		s.running = false
+		s.server = nil
+		s.addr = ""
+		s.mu.Unlock()
+		_ = err // ErrServerClosed is expected on Shutdown
+	}()
+	return nil
+}
+
+// ListenAndServe starts the proxy on addr (e.g. "127.0.0.1:8787") and blocks.
+func (s *Server) ListenAndServe(addr string) error {
+	if err := s.Start(addr); err != nil {
+		return err
+	}
+	// Block until Shutdown clears running state.
+	for {
+		s.mu.Lock()
+		running := s.running
+		s.mu.Unlock()
+		if !running {
+			return nil
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+}
+
+// Status returns the current listen state.
+func (s *Server) Status() Status {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return Status{Running: s.running, Addr: s.addr}
+}
+
+// Running reports whether the server is currently serving.
+func (s *Server) Running() bool {
+	return s.Status().Running
+}
+
+// Addr returns the bound listen address when running, otherwise "".
+func (s *Server) Addr() string {
+	return s.Status().Addr
 }
 
 // Shutdown gracefully stops the HTTP server if running.
@@ -81,7 +147,13 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	if srv == nil {
 		return nil
 	}
-	return srv.Shutdown(ctx)
+	err := srv.Shutdown(ctx)
+	s.mu.Lock()
+	s.running = false
+	s.server = nil
+	s.addr = ""
+	s.mu.Unlock()
+	return err
 }
 
 type chatRequest struct {

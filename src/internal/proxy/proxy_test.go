@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -9,9 +10,51 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"distilly/internal/store"
 )
+
+func TestStartAndShutdown(t *testing.T) {
+	s := openStore(t)
+	srv := New(s)
+
+	if srv.Running() {
+		t.Fatal("expected not running before Start")
+	}
+
+	if err := srv.Start("127.0.0.1:0"); err != nil {
+		t.Fatalf("Start: %v", err)
+	}
+	t.Cleanup(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		_ = srv.Shutdown(ctx)
+	})
+
+	st := srv.Status()
+	if !st.Running || st.Addr == "" {
+		t.Fatalf("status = %+v, want running with addr", st)
+	}
+
+	if err := srv.Start("127.0.0.1:0"); err == nil {
+		t.Fatal("expected error starting twice")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		t.Fatalf("Shutdown: %v", err)
+	}
+
+	deadline := time.Now().Add(2 * time.Second)
+	for srv.Running() && time.Now().Before(deadline) {
+		time.Sleep(10 * time.Millisecond)
+	}
+	if srv.Running() {
+		t.Fatal("expected not running after Shutdown")
+	}
+}
 
 func TestRejectStreaming(t *testing.T) {
 	s := openStore(t)

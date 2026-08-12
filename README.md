@@ -17,11 +17,9 @@ Milestones **1–3 are done**: deterministic CLI linter, confidence-tier
 prompt scoring, and a regression harness that guards optimizations against
 dropping constraints.
 
-**Milestone 4 is mostly built**: Wails desktop app (Lint workspace,
-Dashboard, Settings), SQLite persistence, and a unit-tested
-OpenAI-compatible proxy package. The remaining M4 gap is wiring
-`StartProxy` / `StopProxy` into the App and Settings UI so the proxy is
-startable from the desktop app.
+**Milestone 4 is done**: Wails desktop app (Lint workspace, Dashboard,
+Settings), SQLite persistence, OpenAI-compatible proxy package, and
+`StartProxy` / `StopProxy` / status wired into the App and Settings UI.
 
 There is still **no AI rewrite backend** — everything is rule-based Go.
 No CI yet. Milestone 5 (Tree-sitter code-context selection) is not started.
@@ -62,11 +60,10 @@ src/                       Go module + Wails project root
 - [x] Regression harness (`go test ./...` under `src/`)
 - [x] Desktop Lint workspace (analyze / apply / diff / toggles)
 - [x] Dashboard + Settings (SQLite-backed)
-- [x] Proxy package (non-streaming; tested) — **not yet startable from UI**
+- [x] Proxy package (non-streaming; tested) — start/stop from Settings
 
 ## Later
 
-- Wire proxy start/stop into the desktop app (finish M4)
 - History compression (beyond flagging)
 - CI for the regression suite
 - Code context optimizer (Milestone 5 / Tree-sitter)

@@ -5,8 +5,8 @@ product status; this file covers working inside `src/`.
 
 ## Status
 
-M1–M3 CLI/engine work is done. M4 desktop + store + proxy package are in
-place; proxy lifecycle is not yet bound on `app.go`. See
+M1–M3 CLI/engine work is done. M4 desktop + store + proxy package and
+lifecycle bindings are in place. See
 [`../docs/architecture.md`](../docs/architecture.md) and
 [`../memory-bank/progress.md`](../memory-bank/progress.md).
 
@@ -16,7 +16,7 @@ place; proxy lifecycle is not yet bound on `app.go`. See
 cmd/lint/              CLI entrypoint (distilly-lint)
 internal/lint/         Core engine: Run + Apply + score + examples + jsonify
 internal/api/          Wails Analyze/Apply DTOs
-internal/proxy/        OpenAI-compatible proxy (unwired to App lifecycle)
+internal/proxy/        OpenAI-compatible proxy (Start/Stop bound on App)
 internal/store/        SQLite requests + settings
 internal/tokenizer/    Token counting
 internal/dedupe/       Exact + near-duplicate detection
@@ -48,4 +48,5 @@ wails build    # → build/bin/distilly.app
 ```
 
 Bound on `App` today: `Analyze`, `Apply`, `DiffForDuplicate`, `ListModels`,
-dashboard/settings helpers, `LogRequest`. Not bound: proxy start/stop.
+dashboard/settings helpers, `LogRequest`, `StartProxy`, `StopProxy`,
+`GetProxyStatus`.
