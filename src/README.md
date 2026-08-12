@@ -1,82 +1,51 @@
-# distilly
+# distilly (src)
 
-A local-first prompt linter and optimizer for developers who use LLM APIs
-heavily. Distilly analyzes prompts and conversation history, flags waste
-(duplicate instructions, repeated examples, bloated history), estimates
-API cost, and suggests concrete token reductions — without changing the
-meaning of your prompt.
-
-Think "ESLint for prompts."
+Go module and Wails project root. Prefer the [root README](../README.md) for
+product status; this file covers working inside `src/`.
 
 ## Status
 
-v1 (deterministic linter) and the regression harness are done. Now building
-out Milestone 3's confidence-scored optimizations — see `docs/roadmap.md`.
-Still no AI calls anywhere; everything is rule-based.
+M1–M3 CLI/engine work is done. M4 desktop + store + proxy package are in
+place; proxy lifecycle is not yet bound on `app.go`. See
+[`../docs/architecture.md`](../docs/architecture.md) and
+[`../memory-bank/progress.md`](../memory-bank/progress.md).
 
-## Project layout
+## Layout
 
 ```
-cmd/lint/          CLI entrypoint (distilly-lint)
-internal/tokenizer/ Token counting (tiktoken-compatible)
-internal/lint/      Core lint engine: orchestrates checks, produces a report
-internal/dedupe/    Duplicate instruction / repeated example detection
-internal/history/   Conversation history compression
-internal/cost/      Token -> $ cost estimation per model
-internal/diff/      Side-by-side before/after diff rendering
-internal/regression/ (Prompt, constraints-that-must-survive) pairs guarding the optimizer
-frontend/           React + Vite + Tailwind UI (used later by the Wails desktop app)
-testdata/prompts/   Sample prompts used for regression testing heuristics
-docs/               Design notes, roadmap
+cmd/lint/              CLI entrypoint (distilly-lint)
+internal/lint/         Core engine: Run + Apply + score + examples + jsonify
+internal/api/          Wails Analyze/Apply DTOs
+internal/proxy/        OpenAI-compatible proxy (unwired to App lifecycle)
+internal/store/        SQLite requests + settings
+internal/tokenizer/    Token counting
+internal/dedupe/       Exact + near-duplicate detection
+internal/history/      History length flagger
+internal/cost/         Token → $ estimation
+internal/diff/         Before/after diff
+internal/regression/   Constraint-survival harness
+frontend/              React Lint / Dashboard / Settings
+testdata/prompts/      Regression fixtures
+main.go, app.go        Wails entry + bindings
 ```
 
-## v1 goal: Prompt Linter (no AI required)
-
-- [x] Token counter
-- [x] Duplicate instruction detector
-- [x] Repeated example detector
-- [x] History length flagger
-- [x] Cost estimator
-- [x] Before/after diff view
-- [x] CLI: `distilly-lint <file>` prints a lint report
-
-## Later: v2+
-
-- Semantic compression via local models (Ollama / llama.cpp / GGUF) — deferred for now
-- Code context optimizer (relevant-file selection for repo-aware prompts)
-- Desktop app (Wails) acting as a local proxy between apps and OpenAI/Claude/etc.
-
-## Tech stack
-
-- Backend: Go, SQLite, tiktoken-compatible tokenizer, Tree-sitter (code analysis)
-- Frontend: React, Vite, Tailwind CSS
-- Desktop: Wails (Go + React)
-
-## Getting started
+## CLI
 
 ```bash
-# example.txt has semantically-similar-but-textually-distinct lines
-# (e.g. "Use markdown." / "Respond in markdown." / "Format as markdown.").
-# v1's exact-match dedupe correctly reports 0% savings on it — catching
-# these requires near-duplicate detection (Milestone 3).
-go run ./cmd/lint testdata/prompts/example.txt
-
-# exact_duplicates.txt has real byte-identical repeated instructions,
-# the kind that show up when a prompt template re-includes the system
-# instructions before every few-shot example. v1 catches these.
 go run ./cmd/lint testdata/prompts/exact_duplicates.txt
-
-# -fix prints the optimized prompt instead of the report. By default it
-# only touches the high-confidence tier (exact duplicate lines/examples).
 go run ./cmd/lint -fix testdata/prompts/exact_duplicates.txt
-
-# Lower-confidence tiers (near-duplicates, JSON conversion) need explicit
-# approval — review the report's diff first, then opt in:
-go run ./cmd/lint -fix -approve-near-duplicates -approve-json-conversion testdata/prompts/near_duplicates.txt
-```
-
-Run the test suite with:
-
-```bash
+go run ./cmd/lint -fix -approve-near-duplicates -approve-json-conversion \
+  testdata/prompts/near_duplicates.txt
 go test ./...
 ```
+
+## Desktop
+
+```bash
+wails doctor   # CLI often at ~/go/bin/wails
+wails dev
+wails build    # → build/bin/distilly.app
+```
+
+Bound on `App` today: `Analyze`, `Apply`, `DiffForDuplicate`, `ListModels`,
+dashboard/settings helpers, `LogRequest`. Not bound: proxy start/stop.
