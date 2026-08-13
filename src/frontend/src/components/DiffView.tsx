@@ -9,9 +9,9 @@ type DiffViewProps = {
 }
 
 function lineClass(marker: string): string {
-  if (marker === '-') return 'bg-rose-950/50 text-rose-200'
-  if (marker === '+') return 'bg-emerald-950/50 text-emerald-200'
-  return 'text-slate-300'
+  if (marker === '-') return 'bg-danger-soft text-danger'
+  if (marker === '+') return 'bg-success-soft text-success'
+  return 'text-fg'
 }
 
 function markerLabel(marker: string): string {
@@ -28,15 +28,15 @@ export function DiffView({
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-white/15 bg-black/10 px-4 py-8 text-center text-sm text-slate-400">
+      <div className="rounded-lg border border-dashed border-hairline bg-fill px-4 py-8 text-center text-sm text-muted">
         {emptyMessage}
       </div>
     )
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-white/10 bg-black/30">
-      <div className="border-b border-white/10 px-3 py-2 text-xs uppercase tracking-[0.12em] text-slate-400">
+    <div className="overflow-hidden rounded-lg border border-hairline bg-surface">
+      <div className="border-b border-hairline px-3 py-2 text-xs text-muted">
         Diff
       </div>
       <pre className="max-h-[28rem] overflow-auto p-0 font-mono text-xs leading-5">
