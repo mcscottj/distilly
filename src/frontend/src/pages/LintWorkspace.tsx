@@ -7,6 +7,18 @@ import { SuggestionList } from '../components/SuggestionList'
 import { ApplyToggles, useAnalyze } from '../hooks/useAnalyze'
 import { SettingKey, parseBoolSetting } from '../lib/settings'
 
+const fieldClass =
+  'w-full rounded-md border border-hairline bg-fill px-3 py-2 text-sm text-fg outline-none focus:border-accent focus:ring-1 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-50'
+
+const primaryButtonClass =
+  'rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50'
+
+const secondaryButtonClass =
+  'rounded-md border border-hairline bg-fill px-4 py-2 text-sm text-fg hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50'
+
+const checkboxClass =
+  'size-4 rounded border-hairline bg-fill text-accent focus:ring-accent'
+
 type LintWorkspaceProps = {
   preferredModel?: string
   onPreferredModelConsumed?: () => void
@@ -103,8 +115,8 @@ export function LintWorkspace({
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <div>
-        <h2 className="text-lg font-medium text-white">Lint workspace</h2>
-        <p className="mt-1 text-sm text-slate-400">
+        <h2 className="text-lg font-medium text-fg">Lint workspace</h2>
+        <p className="mt-1 text-sm text-muted">
           Paste a prompt, analyze for savings, then preview and apply optimizations.
         </p>
       </div>
@@ -112,11 +124,11 @@ export function LintWorkspace({
       <form onSubmit={onAnalyze} className="space-y-3">
         <div className="flex flex-wrap items-end gap-3">
           <label className="flex min-w-[12rem] flex-1 flex-col gap-1.5 text-sm">
-            <span className="text-slate-400">Model</span>
+            <span className="text-muted">Model</span>
             <select
               value={model}
               onChange={(e) => setModel(e.target.value)}
-              className="rounded-md border border-white/15 bg-black/25 px-3 py-2 text-sm text-white outline-none focus:border-sky-400"
+              className={fieldClass}
             >
               {models.length === 0 && !model && <option value="">Loading models…</option>}
               {model && !models.includes(model) && (
@@ -132,27 +144,27 @@ export function LintWorkspace({
           <button
             type="submit"
             disabled={loading || !prompt.trim()}
-            className="rounded-md bg-sky-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
+            className={primaryButtonClass}
           >
             {loading ? 'Analyzing…' : 'Analyze'}
           </button>
         </div>
 
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="text-slate-400">Prompt</span>
+          <span className="text-muted">Prompt</span>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows={14}
             placeholder="Paste your full prompt here…"
             spellCheck={false}
-            className="w-full resize-y rounded-md border border-white/15 bg-black/25 px-3 py-2 font-mono text-sm leading-relaxed text-slate-100 outline-none focus:border-sky-400"
+            className={`${fieldClass} resize-y font-mono leading-relaxed`}
           />
         </label>
       </form>
 
       {error && (
-        <p className="rounded-md border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200">
+        <p className="rounded-md border border-danger bg-danger-soft px-3 py-2 text-sm text-danger">
           {error}
         </p>
       )}
@@ -184,11 +196,11 @@ export function LintWorkspace({
         </div>
       )}
 
-      <section className="space-y-4 rounded-lg border border-white/10 bg-black/15 p-4">
+      <section className="space-y-4 rounded-xl border border-hairline bg-surface p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-medium text-white">Optimize &amp; diff</h3>
-            <p className="mt-0.5 text-xs text-slate-400">
+            <h3 className="text-sm font-medium text-fg">Optimize &amp; diff</h3>
+            <p className="mt-0.5 text-xs text-muted">
               Exact duplicates always apply. Opt in to near-duplicates and JSON conversion.
             </p>
           </div>
@@ -197,7 +209,7 @@ export function LintWorkspace({
               type="button"
               onClick={onApply}
               disabled={applying || !prompt.trim()}
-              className="rounded-md bg-sky-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className={primaryButtonClass}
             >
               {applying ? 'Applying…' : applyResult ? 'Refresh diff' : 'Preview apply'}
             </button>
@@ -205,7 +217,7 @@ export function LintWorkspace({
               <button
                 type="button"
                 onClick={useOptimized}
-                className="rounded-md border border-white/20 px-4 py-2 text-sm text-slate-200 hover:bg-white/5"
+                className={secondaryButtonClass}
               >
                 Use optimized in editor
               </button>
@@ -213,7 +225,7 @@ export function LintWorkspace({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-6 text-sm text-slate-300">
+        <div className="flex flex-wrap gap-6 text-sm text-fg">
           <label className="flex cursor-pointer items-center gap-2">
             <input
               type="checkbox"
@@ -224,7 +236,7 @@ export function LintWorkspace({
                   approveNearDuplicates: e.target.checked,
                 })
               }
-              className="size-4 rounded border-white/20 bg-black/40 text-sky-500 focus:ring-sky-400"
+              className={checkboxClass}
             />
             Approve near-duplicates
           </label>
@@ -238,7 +250,7 @@ export function LintWorkspace({
                   approveJsonConversion: e.target.checked,
                 })
               }
-              className="size-4 rounded border-white/20 bg-black/40 text-sky-500 focus:ring-sky-400"
+              className={checkboxClass}
             />
             Approve JSON conversion
           </label>
@@ -246,19 +258,19 @@ export function LintWorkspace({
 
         {applyResult && (
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="overflow-hidden rounded-lg border border-white/10 bg-black/30">
-              <div className="border-b border-white/10 px-3 py-2 text-xs uppercase tracking-[0.12em] text-slate-400">
+            <div className="overflow-hidden rounded-lg border border-hairline bg-fill">
+              <div className="border-b border-hairline px-3 py-2 text-xs text-muted">
                 Before
               </div>
-              <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all p-3 font-mono text-xs leading-5 text-slate-300">
+              <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all p-3 font-mono text-xs leading-5 text-fg">
                 {prompt}
               </pre>
             </div>
-            <div className="overflow-hidden rounded-lg border border-white/10 bg-black/30">
-              <div className="border-b border-white/10 px-3 py-2 text-xs uppercase tracking-[0.12em] text-slate-400">
+            <div className="overflow-hidden rounded-lg border border-hairline bg-fill">
+              <div className="border-b border-hairline px-3 py-2 text-xs text-muted">
                 After
               </div>
-              <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all p-3 font-mono text-xs leading-5 text-slate-300">
+              <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all p-3 font-mono text-xs leading-5 text-fg">
                 {applyResult.optimized}
               </pre>
             </div>

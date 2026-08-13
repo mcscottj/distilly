@@ -21,9 +21,9 @@ export function SectionBreakdown({ sections }: SectionBreakdownProps) {
   const max = Math.max(total, 1)
 
   return (
-    <section className="rounded-lg border border-white/10 bg-black/20 p-4">
-      <h3 className="text-sm font-medium text-white">Section tokens</h3>
-      <p className="mt-0.5 text-xs text-slate-400">
+    <section className="rounded-xl border border-hairline bg-surface p-4">
+      <h3 className="text-sm font-medium text-fg">Section tokens</h3>
+      <p className="mt-0.5 text-xs text-muted">
         {total.toLocaleString()} tokens across sections
       </p>
       <ul className="mt-4 space-y-3">
@@ -33,12 +33,12 @@ export function SectionBreakdown({ sections }: SectionBreakdownProps) {
           return (
             <li key={key}>
               <div className="mb-1 flex items-baseline justify-between text-sm">
-                <span className="text-slate-300">{label}</span>
-                <span className="tabular-nums text-slate-100">{value.toLocaleString()}</span>
+                <span className="text-muted">{label}</span>
+                <span className="tabular-nums text-fg">{value.toLocaleString()}</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+              <div className="h-1.5 overflow-hidden rounded-full bg-fill">
                 <div
-                  className="h-full rounded-full bg-sky-500/70"
+                  className="h-full rounded-full bg-accent"
                   style={{ width: `${pct}%` }}
                 />
               </div>
