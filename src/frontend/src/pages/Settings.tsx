@@ -20,7 +20,7 @@ const checkboxClass =
 
 export function Settings() {
   const { settings, models, loading, saving, error, savedAt, update, save, setError } = useSettings()
-  const { preference, setPreference } = useTheme()
+  const { preference, setPreference, loading: themeLoading } = useTheme()
   const {
     status: proxyStatus,
     busy: proxyBusy,
@@ -94,10 +94,15 @@ export function Settings() {
       )}
 
       <GroupedList caption="Appearance">
-        <GroupedRow label="Appearance" description="Choose light, dark, or match the system.">
+        <GroupedRow label="Theme" description="Choose light, dark, or match the system.">
           <SegmentedControl
             value={preference}
-            onChange={(v) => void setPreference(v)}
+            disabled={themeLoading}
+            onChange={(v) => {
+              void setPreference(v).catch((err) => {
+                setError(err instanceof Error ? err.message : 'Failed to save theme preference')
+              })
+            }}
             options={[
               { value: 'light', label: 'Light' },
               { value: 'dark', label: 'Dark' },
@@ -198,7 +203,7 @@ export function Settings() {
               value={settings.proxyPort}
               onChange={(e) => update('proxyPort', e.target.value.replace(/[^\d]/g, ''))}
               placeholder="8787"
-              disabled={formDisabled || proxyRunning}
+              disabled={formDisabled || proxyRunning || proxyBusy}
               className={`${fieldClass} sm:ml-auto sm:w-40`}
             />
           </GroupedRow>
