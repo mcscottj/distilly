@@ -14,7 +14,8 @@ Make the Distilly Wails desktop app read as a native macOS utility: light theme 
 |-------|--------|
 | Layout | Sidebar shell (Lint / Dashboard / Settings); drop top “Distilly / Desktop” header |
 | Depth | Chrome + shared controls; Settings remade as grouped lists; Lint/Dashboard lighter restyle only |
-| Accent | macOS system blue (`#007AFF` light; slightly brighter in dark) |
+| Accent | Wood brown from logo barrel (`#8B5E3C` light; slightly lighter in dark, e.g. `#C4A484`) |
+| Branding | Sidebar uses Distilly wordmark and/or barrel logo ([`docs/distilly-logo.png`](docs/distilly-logo.png)); chrome stays macOS gray/white, not wood-washed |
 | Theme approach | Semantic CSS tokens + `data-theme` on `<html>` |
 | Default preference | Light |
 | Preference values | `light` \| `dark` \| `system` |
@@ -77,13 +78,20 @@ Define semantic CSS custom properties in [`src/frontend/src/style.css`](src/fron
 | `--border` | Hairlines |
 | `--text-primary` | Titles, primary copy |
 | `--text-secondary` | Labels, muted |
-| `--accent` | Primary actions, selection, focus |
-| `--accent-fg` | Text on accent |
+| `--accent` | Primary actions, selection, focus (wood brown) |
+| `--accent-fg` | Text on accent (near-white) |
 | `--danger` / `--success` / `--warning` | Errors, savings, mid scores |
+
+Accent values (locked starting point; tweak only if contrast fails WCAG-ish checks on buttons):
+
+| Theme | `--accent` | Notes |
+|-------|------------|-------|
+| Light | `#8B5E3C` | Mid barrel stave |
+| Dark | `#C4A484` | Lighter wood so selected nav / buttons read on dark fills |
 
 Tailwind utilities should consume these tokens (e.g. `bg-[var(--bg-surface)]`, or Tailwind v4 `@theme` mapping). Remove the current navy radial gradients and hardcoded `sky-*` / `white/10` / `black/25` palette from UI surfaces.
 
-Score and diff colors stay semantic success/warning/danger (not accent blue).
+Score and diff colors stay semantic success/warning/danger (not wood accent). Do not tint the whole window brown — surfaces stay neutral macOS gray/white (and dark equivalents).
 
 ### Typography
 
@@ -99,10 +107,11 @@ Score and diff colors stay semantic success/warning/danger (not accent blue).
 [`src/frontend/src/App.tsx`](src/frontend/src/App.tsx):
 
 - Horizontal split: fixed-width sidebar (~220px) + scrollable main
-- Sidebar: Distilly wordmark (quiet, not a second hero headline), then nav rows for Lint / Dashboard / Settings
-- Selected nav: accent-tinted background + accent text
+- Sidebar: barrel logo (small) + Distilly wordmark (quiet, not a second hero headline), then nav rows for Lint / Dashboard / Settings
+- Selected nav: wood-accent-tinted background + accent text
 - Unselected: primary/secondary text, hover fill
 - Main: page content with comfortable padding; no duplicate top brand header
+- Copy logo asset into the frontend (e.g. `src/frontend/src/assets/distilly-logo.png`) so the bundled app can load it
 
 ### Settings
 
@@ -176,6 +185,6 @@ Update [`src/main.go`](src/main.go) `BackgroundColour` to a light default matchi
 1. Fresh install opens in light theme and looks like a light macOS utility (sidebar + gray canvas + white groups).
 2. User can choose Light, Dark, or System; choice survives restart.
 3. System tracks OS appearance without restart.
-4. Accent is system blue; Distilly branding is quiet in the sidebar.
+4. Accent is wood brown from the logo; barrel + wordmark sit quietly in the sidebar; surfaces stay neutral macOS gray/white.
 5. Lint and Dashboard behavior unchanged; only look-and-feel updated.
 6. No frameless/vibrancy work shipped in this pass.
