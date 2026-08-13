@@ -12,7 +12,7 @@ export function GroupedList({
   return (
     <section className="space-y-2">
       {caption ? (
-        <h3 className="px-1 text-xs font-medium uppercase tracking-wide text-muted">
+        <h3 className="px-1 text-xs font-medium text-muted">
           {caption}
         </h3>
       ) : null}

@@ -83,8 +83,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [resolved])
 
   const setPreference = useCallback(async (next: ThemePreference) => {
-    setPreferenceState(next)
-    await SetSetting(SettingKey.Theme, next)
+    let previous: ThemePreference = 'light'
+    setPreferenceState((prev) => {
+      previous = prev
+      return next
+    })
+    try {
+      await SetSetting(SettingKey.Theme, next)
+    } catch (err) {
+      setPreferenceState(previous)
+      throw err
+    }
   }, [])
 
   const value = useMemo(

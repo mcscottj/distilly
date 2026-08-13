@@ -31,7 +31,7 @@ export function SidebarNav({ page, onNavigate }: SidebarNavProps) {
               className={
                 active
                   ? 'rounded-md bg-accent-soft px-3 py-1.5 text-left text-sm font-medium text-accent'
-                  : 'rounded-md px-3 py-1.5 text-left text-sm text-fg hover:bg-fill'
+                  : 'rounded-md px-3 py-1.5 text-left text-sm text-fg hover:bg-surface'
               }
             >
               {item.label}
