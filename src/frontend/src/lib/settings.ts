@@ -7,6 +7,7 @@ export const SettingKey = {
   ApproveNearDuplicates: 'approve_near_duplicates',
   ApproveJsonConversion: 'approve_json_conversion',
   Passthrough: 'passthrough',
+  Theme: 'theme',
 } as const
 
 export type SettingKeyName = (typeof SettingKey)[keyof typeof SettingKey]
@@ -19,6 +20,7 @@ export const SETTING_DEFAULTS: Record<SettingKeyName, string> = {
   [SettingKey.ApproveNearDuplicates]: 'false',
   [SettingKey.ApproveJsonConversion]: 'false',
   [SettingKey.Passthrough]: 'false',
+  [SettingKey.Theme]: 'light',
 }
 
 export function parseBoolSetting(value: string | null | undefined): boolean {
