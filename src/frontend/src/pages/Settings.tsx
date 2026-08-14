@@ -122,6 +122,7 @@ export function Settings() {
         >
           <input
             type="checkbox"
+            aria-label="High contrast"
             checked={contrast === 'high'}
             disabled={themeLoading}
             onChange={(e) => {
