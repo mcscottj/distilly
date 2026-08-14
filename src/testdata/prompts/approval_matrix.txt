@@ -1,0 +1,31 @@
+System:
+You are a records assistant.
+Always return JSON objects.
+Always return JSON objects!
+Do not wrap the payload in markdown fences.
+Do not wrap the payload in markdown code fences.
+Name: Ada Lovelace
+Age: 36
+City: London
+Occupation: Mathematician
+Department: Analytical Engine
+Status: Active
+
+Example 1:
+Q: Format Alice
+A: {"name":"Alice","ok":true}
+
+Example 2:
+Q: Format Bob
+A: {"name":"Bob","ok":true}
+
+Example 3:
+Q: Format Alice
+A: {"name":"Alice","ok":true}
+
+Example 4:
+Q: Format Alice?
+A: {"name":"Alice","ok":true}
+
+Question:
+Format Carol as JSON with name and ok.

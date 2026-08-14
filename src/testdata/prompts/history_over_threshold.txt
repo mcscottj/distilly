@@ -1,0 +1,25 @@
+System:
+You are a debugging co-pilot. Stay on the current failure mode.
+
+History:
+User: My deploy is failing in CI.
+Assistant: Which step fails — build, test, or publish?
+User: The test step.
+Assistant: Paste the first failing test name and assertion.
+User: TestApplyNearDuplicates/without_approval.
+Assistant: That suggests an opt-in flag path. Are approval toggles off?
+User: Yes, both toggles are off.
+Assistant: Good. Exact duplicates should still collapse.
+User: Exact collapse works. Near duplicates stay.
+Assistant: Expected. Near-duplicates need explicit approval.
+User: I also have Key: value lines in System.
+Assistant: JSON conversion is also opt-in and never automatic.
+User: Score dropped a lot after I pasted a long chat.
+Assistant: Long history is flagged once turn count exceeds the threshold.
+User: How many turns is that?
+Assistant: Currently more than 10 parsed User/Assistant lines.
+User: Can I compress history automatically yet?
+Assistant: Not yet — Milestone work still flags rather than rewrites history.
+
+Question:
+Summarize the expected Apply behavior for exact vs near vs JSON conversion.

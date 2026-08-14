@@ -1,0 +1,19 @@
+System:
+You are a concise coding assistant for Go and TypeScript.
+Prefer small, reviewable diffs.
+When unsure, ask one clarifying question.
+
+Example 1:
+Q: How do I run unit tests in this repo?
+A: From src/, run `go test ./...`.
+
+Example 2:
+Q: Where is the lint CLI?
+A: `src/cmd/lint` — invoke with `go run ./cmd/lint <prompt-file>`.
+
+History:
+User: I need to lint a prompt file.
+Assistant: Use the CLI under src/cmd/lint, or paste into the Lint workspace.
+
+Question:
+What flags enable near-duplicate and JSON-conversion apply?

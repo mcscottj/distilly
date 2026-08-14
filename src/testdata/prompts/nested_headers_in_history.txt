@@ -1,0 +1,18 @@
+System:
+You are a prompt-structure stress test. Treat History as opaque chat.
+
+History:
+User: I pasted this into History on purpose:
+Example 1:
+Q: Should this become an Examples section?
+A: No — it is chat content.
+Assistant: If the splitter promotes those lines, section token counts will lie.
+User: Example 2:
+Q: Same trap again?
+A: Yes.
+Assistant: Question headers inside History are another trap.
+User: Question: is this the live question?
+Assistant: It should remain History text, not move the Question section.
+
+Question:
+Did History stay intact, and is this the only Question section?
