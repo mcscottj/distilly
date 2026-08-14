@@ -169,10 +169,10 @@ export function Settings() {
               })
             }}
             options={[
-              { value: '12', label: '12' },
-              { value: '14', label: '14' },
-              { value: '16', label: '16' },
-              { value: '18', label: '18' },
+              { value: '12', label: '12 px' },
+              { value: '14', label: '14 px' },
+              { value: '16', label: '16 px' },
+              { value: '18', label: '18 px' },
             ]}
           />
         </GroupedRow>

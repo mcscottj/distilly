@@ -18,7 +18,7 @@ export function SidebarNav({ page, onNavigate }: SidebarNavProps) {
     <aside className="flex w-[220px] shrink-0 flex-col border-r border-hairline bg-sidebar">
       <div className="flex items-center gap-2 px-4 py-4">
         <img src={logo} alt="" className="size-9 object-contain" />
-        <span className="text-[15px] font-semibold tracking-tight text-fg">distilly</span>
+        <span className="text-base font-semibold tracking-tight text-fg">distilly</span>
       </div>
       <nav className="flex flex-col gap-0.5 px-2 pb-4">
         {navItems.map((item) => {
