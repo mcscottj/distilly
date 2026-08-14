@@ -20,7 +20,13 @@ const checkboxClass =
 
 export function Settings() {
   const { settings, models, loading, saving, error, savedAt, update, save, setError } = useSettings()
-  const { preference, setPreference, loading: themeLoading } = useTheme()
+  const {
+    preference,
+    setPreference,
+    contrast,
+    setContrast,
+    loading: themeLoading,
+  } = useTheme()
   const {
     status: proxyStatus,
     busy: proxyBusy,
@@ -108,6 +114,22 @@ export function Settings() {
               { value: 'dark', label: 'Dark' },
               { value: 'system', label: 'System' },
             ]}
+          />
+        </GroupedRow>
+        <GroupedRow
+          label="High contrast"
+          description="Stronger text, borders, and focus rings for low vision."
+        >
+          <input
+            type="checkbox"
+            checked={contrast === 'high'}
+            disabled={themeLoading}
+            onChange={(e) => {
+              void setContrast(e.target.checked ? 'high' : 'normal').catch((err) => {
+                setError(err instanceof Error ? err.message : 'Failed to save contrast preference')
+              })
+            }}
+            className={checkboxClass}
           />
         </GroupedRow>
       </GroupedList>
