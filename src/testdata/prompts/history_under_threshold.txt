@@ -1,0 +1,15 @@
+System:
+You are a brief helper.
+
+History:
+User: Hi.
+Assistant: Hello — what do you need?
+User: How do I start the desktop app?
+Assistant: From src/, run `wails dev` after `wails doctor` looks healthy.
+User: And the CLI?
+Assistant: `go run ./cmd/lint testdata/prompts/clean_baseline.txt`
+User: Thanks.
+Assistant: Anytime.
+
+Question:
+Where do I toggle Approve Near Duplicates in the UI?
