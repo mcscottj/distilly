@@ -18,6 +18,7 @@
   --success: #1f7a4c;
   --success-soft: rgba(31, 122, 76, 0.12);
   --warning: #b57900;
+  --border-width: 1px;
   color: var(--fg);
   background: var(--bg-window);
 }
@@ -59,6 +60,7 @@
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
+  --border-width-hairline: var(--border-width);
 }
 
 html,
@@ -71,4 +73,38 @@ body,
 body {
   background: var(--bg-window);
   color: var(--fg);
+}
+
+[data-contrast="high"] {
+  --fg: #000000;
+  --muted: #3a3a3c;
+  --border: rgba(0, 0, 0, 0.45);
+  --border-width: 2px;
+  --accent-soft: rgba(139, 94, 60, 0.28);
+  --danger-soft: rgba(192, 57, 43, 0.22);
+  --success-soft: rgba(31, 122, 76, 0.22);
+}
+
+[data-theme="dark"][data-contrast="high"] {
+  --fg: #ffffff;
+  --muted: #d1d1d6;
+  --border: rgba(255, 255, 255, 0.45);
+  --border-width: 2px;
+  --accent-soft: rgba(196, 164, 132, 0.36);
+  --danger-soft: rgba(255, 107, 107, 0.28);
+  --success-soft: rgba(107, 207, 142, 0.28);
+}
+
+[data-contrast="high"] .border-hairline,
+[data-contrast="high"] [class*="border-hairline"] {
+  border-width: var(--border-width);
+}
+
+[data-contrast="high"] :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+[data-contrast="high"] :focus:not(:focus-visible) {
+  outline: none;
 }
