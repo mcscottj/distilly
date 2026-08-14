@@ -9,6 +9,8 @@ export const SettingKey = {
   Passthrough: 'passthrough',
   Theme: 'theme',
   ThemeContrast: 'theme_contrast',
+  UiFontScale: 'ui_font_scale',
+  EditorFontSize: 'editor_font_size',
 } as const
 
 export type SettingKeyName = (typeof SettingKey)[keyof typeof SettingKey]
@@ -23,6 +25,8 @@ export const SETTING_DEFAULTS: Record<SettingKeyName, string> = {
   [SettingKey.Passthrough]: 'false',
   [SettingKey.Theme]: 'light',
   [SettingKey.ThemeContrast]: 'normal',
+  [SettingKey.UiFontScale]: 'default',
+  [SettingKey.EditorFontSize]: '14',
 }
 
 export function parseBoolSetting(value: string | null | undefined): boolean {

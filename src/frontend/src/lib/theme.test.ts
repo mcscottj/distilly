@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   parseThemePreference,
   parseThemeContrast,
+  parseUiFontScale,
+  parseEditorFontSize,
+  editorFontSizePx,
   resolveTheme,
   windowBackgroundRGBA,
 } from './theme'
@@ -51,5 +54,45 @@ describe('parseThemeContrast', () => {
   it('accepts normal and high', () => {
     expect(parseThemeContrast('normal')).toBe('normal')
     expect(parseThemeContrast('high')).toBe('high')
+  })
+})
+
+describe('parseUiFontScale', () => {
+  it('defaults invalid or empty to default', () => {
+    expect(parseUiFontScale(undefined)).toBe('default')
+    expect(parseUiFontScale(null)).toBe('default')
+    expect(parseUiFontScale('')).toBe('default')
+    expect(parseUiFontScale('nope')).toBe('default')
+  })
+
+  it('accepts default, large, xlarge', () => {
+    expect(parseUiFontScale('default')).toBe('default')
+    expect(parseUiFontScale('large')).toBe('large')
+    expect(parseUiFontScale('xlarge')).toBe('xlarge')
+  })
+})
+
+describe('parseEditorFontSize', () => {
+  it('defaults invalid or empty to 14', () => {
+    expect(parseEditorFontSize(undefined)).toBe('14')
+    expect(parseEditorFontSize(null)).toBe('14')
+    expect(parseEditorFontSize('')).toBe('14')
+    expect(parseEditorFontSize('20')).toBe('14')
+    expect(parseEditorFontSize('nope')).toBe('14')
+  })
+
+  it('accepts 12, 14, 16, 18', () => {
+    expect(parseEditorFontSize('12')).toBe('12')
+    expect(parseEditorFontSize('14')).toBe('14')
+    expect(parseEditorFontSize('16')).toBe('16')
+    expect(parseEditorFontSize('18')).toBe('18')
+  })
+})
+
+describe('editorFontSizePx', () => {
+  it('appends px', () => {
+    expect(editorFontSizePx('12')).toBe('12px')
+    expect(editorFontSizePx('14')).toBe('14px')
+    expect(editorFontSizePx('18')).toBe('18px')
   })
 })
