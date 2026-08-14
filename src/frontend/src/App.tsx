@@ -20,14 +20,24 @@ function App() {
     <div className="flex h-full min-h-0 bg-window text-fg">
       <SidebarNav page={page} onNavigate={setPage} />
       <main className="min-w-0 flex-1 overflow-auto p-6">
-        {page === 'lint' && (
+        <div className={page === 'lint' ? undefined : 'hidden'} aria-hidden={page !== 'lint'}>
           <LintWorkspace
             preferredModel={lintModel}
             onPreferredModelConsumed={() => setLintModel(undefined)}
           />
-        )}
-        {page === 'dashboard' && <Dashboard onOpenRequest={openRequestInLint} />}
-        {page === 'settings' && <Settings />}
+        </div>
+        <div
+          className={page === 'dashboard' ? undefined : 'hidden'}
+          aria-hidden={page !== 'dashboard'}
+        >
+          <Dashboard onOpenRequest={openRequestInLint} />
+        </div>
+        <div
+          className={page === 'settings' ? undefined : 'hidden'}
+          aria-hidden={page !== 'settings'}
+        >
+          <Settings />
+        </div>
       </main>
     </div>
   )

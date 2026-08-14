@@ -232,6 +232,25 @@ export namespace api {
 
 }
 
+export namespace proxy {
+	
+	export class Status {
+	    running: boolean;
+	    addr: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Status(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.running = source["running"];
+	        this.addr = source["addr"];
+	    }
+	}
+
+}
+
 export namespace store {
 	
 	export class ModelStats {
@@ -315,25 +334,6 @@ export namespace store {
 	        this.savingsPct = source["savingsPct"];
 	        this.costUsd = source["costUsd"];
 	        this.savingsUsd = source["savingsUsd"];
-	    }
-	}
-
-}
-
-export namespace proxy {
-	
-	export class Status {
-	    running: boolean;
-	    addr: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new Status(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.running = source["running"];
-	        this.addr = source["addr"];
 	    }
 	}
 
