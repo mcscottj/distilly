@@ -109,6 +109,10 @@ Start and stop the proxy from **Settings** (`StartProxy` / `StopProxy` / `GetPro
 
 Data lives in SQLite under the user config dir (`…/distilly/distilly.db`).
 
+## User documentation
+
+End-user explanation of every shipped surface (Lint, Dashboard, Settings, CLI, proxy) is in [`user-guide.md`](user-guide.md).
+
 ## Test fixtures
 
 Prompt fixtures used for CLI/desktop regression and exploratory coverage are catalogued in [`prompt-fixtures.md`](prompt-fixtures.md) (`src/testdata/prompts/`).

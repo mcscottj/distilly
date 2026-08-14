@@ -25,7 +25,8 @@ There is still **no AI rewrite backend** — everything is rule-based Go.
 No CI yet. Milestone 5 (Tree-sitter code-context selection) is not started.
 
 See [`docs/roadmap.md`](docs/roadmap.md), [`docs/architecture.md`](docs/architecture.md),
-[`docs/prompt-fixtures.md`](docs/prompt-fixtures.md), and [`memory-bank/`](memory-bank/) for detail.
+[`docs/user-guide.md`](docs/user-guide.md), [`docs/prompt-fixtures.md`](docs/prompt-fixtures.md),
+and [`memory-bank/`](memory-bank/) for detail.
 
 ## Project layout
 
