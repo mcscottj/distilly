@@ -25,6 +25,10 @@ export function Settings() {
     setPreference,
     contrast,
     setContrast,
+    uiFontScale,
+    setUiFontScale,
+    editorFontSize,
+    setEditorFontSize,
     loading: themeLoading,
   } = useTheme()
   const {
@@ -131,6 +135,45 @@ export function Settings() {
               })
             }}
             className={checkboxClass}
+          />
+        </GroupedRow>
+        <GroupedRow
+          label="Interface text"
+          description="Enlarge labels, buttons, and chrome across the app."
+        >
+          <SegmentedControl
+            value={uiFontScale}
+            disabled={themeLoading}
+            onChange={(v) => {
+              void setUiFontScale(v).catch((err) => {
+                setError(err instanceof Error ? err.message : 'Failed to save interface text size')
+              })
+            }}
+            options={[
+              { value: 'default', label: 'Default' },
+              { value: 'large', label: 'Large' },
+              { value: 'xlarge', label: 'Extra large' },
+            ]}
+          />
+        </GroupedRow>
+        <GroupedRow
+          label="Editor text"
+          description="Font size for Lint prompt, diffs, and other monospace panels."
+        >
+          <SegmentedControl
+            value={editorFontSize}
+            disabled={themeLoading}
+            onChange={(v) => {
+              void setEditorFontSize(v).catch((err) => {
+                setError(err instanceof Error ? err.message : 'Failed to save editor text size')
+              })
+            }}
+            options={[
+              { value: '12', label: '12' },
+              { value: '14', label: '14' },
+              { value: '16', label: '16' },
+              { value: '18', label: '18' },
+            ]}
           />
         </GroupedRow>
       </GroupedList>
