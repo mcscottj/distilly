@@ -1,11 +1,19 @@
 export type ThemePreference = 'light' | 'dark' | 'system'
 export type ResolvedTheme = 'light' | 'dark'
+export type ThemeContrast = 'normal' | 'high'
 
 export function parseThemePreference(value: string | null | undefined): ThemePreference {
   if (value === 'light' || value === 'dark' || value === 'system') {
     return value
   }
   return 'light'
+}
+
+export function parseThemeContrast(value: string | null | undefined): ThemeContrast {
+  if (value === 'normal' || value === 'high') {
+    return value
+  }
+  return 'normal'
 }
 
 export function resolveTheme(preference: ThemePreference, systemDark: boolean): ResolvedTheme {

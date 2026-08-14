@@ -8,6 +8,7 @@ export const SettingKey = {
   ApproveJsonConversion: 'approve_json_conversion',
   Passthrough: 'passthrough',
   Theme: 'theme',
+  ThemeContrast: 'theme_contrast',
 } as const
 
 export type SettingKeyName = (typeof SettingKey)[keyof typeof SettingKey]
@@ -21,6 +22,7 @@ export const SETTING_DEFAULTS: Record<SettingKeyName, string> = {
   [SettingKey.ApproveJsonConversion]: 'false',
   [SettingKey.Passthrough]: 'false',
   [SettingKey.Theme]: 'light',
+  [SettingKey.ThemeContrast]: 'normal',
 }
 
 export function parseBoolSetting(value: string | null | undefined): boolean {

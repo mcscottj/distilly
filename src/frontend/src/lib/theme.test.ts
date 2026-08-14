@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   parseThemePreference,
+  parseThemeContrast,
   resolveTheme,
   windowBackgroundRGBA,
 } from './theme'
@@ -36,5 +37,19 @@ describe('windowBackgroundRGBA', () => {
   it('returns light and dark window fills', () => {
     expect(windowBackgroundRGBA('light')).toEqual({ R: 245, G: 245, B: 247, A: 255 })
     expect(windowBackgroundRGBA('dark')).toEqual({ R: 28, G: 28, B: 30, A: 255 })
+  })
+})
+
+describe('parseThemeContrast', () => {
+  it('defaults invalid or empty to normal', () => {
+    expect(parseThemeContrast(undefined)).toBe('normal')
+    expect(parseThemeContrast(null)).toBe('normal')
+    expect(parseThemeContrast('')).toBe('normal')
+    expect(parseThemeContrast('nope')).toBe('normal')
+  })
+
+  it('accepts normal and high', () => {
+    expect(parseThemeContrast('normal')).toBe('normal')
+    expect(parseThemeContrast('high')).toBe('high')
   })
 })
