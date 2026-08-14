@@ -109,6 +109,10 @@ Start and stop the proxy from **Settings** (`StartProxy` / `StopProxy` / `GetPro
 
 Data lives in SQLite under the user config dir (`…/distilly/distilly.db`).
 
+## User documentation
+
+End-user explanation of every shipped surface (Lint, Dashboard, Settings, CLI, proxy) is in [`user-guide.md`](user-guide.md).
+
 ## Milestone context
 
 See also [`roadmap.md`](roadmap.md).
