@@ -39,7 +39,7 @@ export function DiffView({
       <div className="border-b border-hairline px-3 py-2 text-xs text-muted">
         Diff
       </div>
-      <pre className="max-h-[28rem] overflow-auto p-0 font-mono text-xs leading-5">
+      <pre className="font-editor max-h-[28rem] overflow-auto p-0">
         {rows.map((line, i) => (
           <div
             key={`${i}-${line.marker}-${line.content.slice(0, 24)}`}
