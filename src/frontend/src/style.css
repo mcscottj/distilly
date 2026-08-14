@@ -19,6 +19,7 @@
   --success-soft: rgba(31, 122, 76, 0.12);
   --warning: #b57900;
   --border-width: 1px;
+  --editor-font-size: 14px;
   color: var(--fg);
   background: var(--bg-window);
 }
@@ -74,6 +75,12 @@ body {
   color: var(--fg);
 }
 
+.font-editor {
+  font-family: var(--font-mono);
+  font-size: var(--editor-font-size);
+  line-height: 1.5;
+}
+
 [data-contrast="high"] {
   --fg: #000000;
   --muted: #3a3a3c;
@@ -117,4 +124,25 @@ body {
 [data-contrast="high"] :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* Interface text scale — override Tailwind v4 --text-* theme vars (no rem-root zoom). */
+[data-ui-scale="large"] {
+  --text-xs: 0.875rem; /* 14px */
+  --text-sm: 1rem; /* 16px */
+  --text-base: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.6875rem;
+  --text-4xl: 2.5rem;
+}
+
+[data-ui-scale="xlarge"] {
+  --text-xs: 0.9375rem; /* 15px */
+  --text-sm: 1.125rem; /* 18px */
+  --text-base: 1.25rem;
+  --text-lg: 1.375rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-4xl: 2.75rem;
 }
