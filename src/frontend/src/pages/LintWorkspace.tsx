@@ -7,11 +7,12 @@ import { SuggestionList } from '../components/SuggestionList'
 import { ApplyToggles, useAnalyze } from '../hooks/useAnalyze'
 import { SettingKey, parseBoolSetting } from '../lib/settings'
 
-const fieldClass =
-  'w-full rounded-md border border-hairline bg-fill px-3 py-2 text-sm text-fg outline-none focus:border-accent focus:ring-1 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-50'
-
-const editorFieldClass =
+const fieldBaseClass =
   'w-full rounded-md border border-hairline bg-fill px-3 py-2 text-fg outline-none focus:border-accent focus:ring-1 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-50'
+
+const fieldClass = `${fieldBaseClass} text-sm`
+
+const editorFieldClass = fieldBaseClass
 
 const primaryButtonClass =
   'rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50'
@@ -157,7 +158,7 @@ export function LintWorkspace({
             rows={14}
             placeholder="Paste your full prompt here…"
             spellCheck={false}
-            className={`${editorFieldClass} font-editor resize-y leading-relaxed`}
+            className={`${editorFieldClass} font-editor resize-y`}
           />
         </label>
 

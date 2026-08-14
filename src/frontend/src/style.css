@@ -126,7 +126,8 @@ body {
   outline-offset: 2px;
 }
 
-/* Interface text scale — override Tailwind v4 --text-* theme vars (no rem-root zoom). */
+/* Interface text scale — override Tailwind v4 --text-* theme vars (no rem-root zoom).
+   Arbitrary sizes like text-[15px] bypass this; prefer mapped tokens (text-xs/sm/base/…). */
 [data-ui-scale="large"] {
   --text-xs: 0.875rem; /* 14px */
   --text-sm: 1rem; /* 16px */
