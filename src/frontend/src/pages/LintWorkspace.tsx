@@ -112,6 +112,11 @@ export function LintWorkspace({
     clearResults()
   }
 
+  function onClear() {
+    setPrompt('')
+    clearResults()
+  }
+
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <div>
@@ -122,33 +127,24 @@ export function LintWorkspace({
       </div>
 
       <form onSubmit={onAnalyze} className="space-y-3">
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="flex min-w-[12rem] flex-1 flex-col gap-1.5 text-sm">
-            <span className="text-muted">Model</span>
-            <select
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              className={fieldClass}
-            >
-              {models.length === 0 && !model && <option value="">Loading models…</option>}
-              {model && !models.includes(model) && (
-                <option value={model}>{model}</option>
-              )}
-              {models.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="submit"
-            disabled={loading || !prompt.trim()}
-            className={primaryButtonClass}
+        <label className="flex min-w-[12rem] flex-col gap-1.5 text-sm sm:max-w-xs">
+          <span className="text-muted">Model</span>
+          <select
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+            className={fieldClass}
           >
-            {loading ? 'Analyzing…' : 'Analyze'}
-          </button>
-        </div>
+            {models.length === 0 && !model && <option value="">Loading models…</option>}
+            {model && !models.includes(model) && (
+              <option value={model}>{model}</option>
+            )}
+            {models.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <label className="flex flex-col gap-1.5 text-sm">
           <span className="text-muted">Prompt</span>
@@ -161,6 +157,24 @@ export function LintWorkspace({
             className={`${fieldClass} resize-y font-mono leading-relaxed`}
           />
         </label>
+
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClear}
+            disabled={loading || (!prompt && !analysis && !applyResult && !error)}
+            className={secondaryButtonClass}
+          >
+            Clear
+          </button>
+          <button
+            type="submit"
+            disabled={loading || !prompt.trim()}
+            className={primaryButtonClass}
+          >
+            {loading ? 'Analyzing…' : 'Analyze'}
+          </button>
+        </div>
       </form>
 
       {error && (
