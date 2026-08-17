@@ -160,9 +160,9 @@ Aggregate view of logged optimization activity.
 | **Recent requests** | Latest rows: time, source, model, tokens before→after, % and $ saved |
 | **Refresh** | Reloads stats from the local database |
 
-Clicking a recent row opens **Lint** with that row’s **model** selected. Prompt text is **not** stored in the request log.
+Rows are written when you **Analyze** a prompt in Lint, and when traffic goes through the **local proxy**.
 
-Today, rows are written primarily by the **local proxy**. Manual Analyze in the Lint workspace does not yet append Dashboard history.
+Clicking a recent row opens **Lint** with that row’s **model** selected. Prompt text is **not** stored in the request log.
 
 ### Settings
 

@@ -4,7 +4,7 @@ import { store } from '../../wailsjs/go/models'
 
 const RECENT_LIMIT = 25
 
-export function useDashboard() {
+export function useDashboard(active = true) {
   const [stats, setStats] = useState<store.DashboardStats | null>(null)
   const [recent, setRecent] = useState<store.Request[]>([])
   const [loading, setLoading] = useState(true)
@@ -37,8 +37,9 @@ export function useDashboard() {
   }, [])
 
   useEffect(() => {
+    if (!active) return
     void refresh()
-  }, [refresh])
+  }, [active, refresh])
 
   return { stats, recent, loading, error, refresh }
 }

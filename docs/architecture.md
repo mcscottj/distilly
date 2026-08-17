@@ -62,11 +62,13 @@ sequenceDiagram
   participant UI as React_or_CLI
   participant App as App_or_api
   participant Lint as lint_engine
+  participant DB as SQLite
 
   User->>UI: Paste or file prompt + model
   UI->>App: Analyze
   App->>Lint: Run(prompt, model)
   Lint-->>App: Report tokens issues savings score
+  App->>DB: Log source equals manual when desktop Analyze
   App-->>UI: Show score sections suggestions
   User->>UI: Apply with opt-in flags
   UI->>App: Apply
@@ -104,7 +106,7 @@ Start and stop the proxy from **Settings** (`StartProxy` / `StopProxy` / `GetPro
 ## Desktop UI surface
 
 - **Lint workspace** — editor, model picker, score, sections, suggestions, apply + diff
-- **Dashboard** — aggregate tokens/$ saved, recent requests (mainly from proxy logs)
+- **Dashboard** — aggregate tokens/$ saved, recent requests (from Lint Analyze and proxy logs)
 - **Settings** — upstream URL, API key, proxy port, start/stop/status, approval toggles, passthrough
 
 Data lives in SQLite under the user config dir (`…/distilly/distilly.db`).
