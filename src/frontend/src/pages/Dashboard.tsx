@@ -6,11 +6,12 @@ const secondaryButtonClass =
   'rounded-md border border-hairline bg-fill px-3 py-1.5 text-sm text-fg hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50'
 
 type DashboardProps = {
+  active?: boolean
   onOpenRequest?: (request: store.Request) => void
 }
 
-export function Dashboard({ onOpenRequest }: DashboardProps) {
-  const { stats, recent, loading, error, refresh } = useDashboard()
+export function Dashboard({ active = true, onOpenRequest }: DashboardProps) {
+  const { stats, recent, loading, error, refresh } = useDashboard(active)
 
   const byModel = stats?.byModel ?? []
 

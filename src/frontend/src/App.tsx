@@ -30,7 +30,7 @@ function App() {
           className={page === 'dashboard' ? undefined : 'hidden'}
           aria-hidden={page !== 'dashboard'}
         >
-          <Dashboard onOpenRequest={openRequestInLint} />
+          <Dashboard active={page === 'dashboard'} onOpenRequest={openRequestInLint} />
         </div>
         <div
           className={page === 'settings' ? undefined : 'hidden'}

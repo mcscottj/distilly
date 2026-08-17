@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"sync"
@@ -87,8 +88,44 @@ func (a *App) ListModels() []string {
 }
 
 // Analyze lints a prompt and returns a serializable report for the UI.
+// Successful analyses are appended to the request log for the Dashboard.
 func (a *App) Analyze(req api.AnalyzeRequest) api.AnalyzeResponse {
-	return api.Analyze(req)
+	resp := api.Analyze(req)
+	if err := a.logManualAnalysis(resp); err != nil {
+		fmt.Fprintf(os.Stderr, "distilly: log analyze: %v\n", err)
+	}
+	return resp
+}
+
+func (a *App) logManualAnalysis(resp api.AnalyzeResponse) error {
+	if a == nil || a.store == nil {
+		return nil
+	}
+	_, err := a.store.InsertRequest(manualRequestFromAnalysis(resp))
+	return err
+}
+
+func manualRequestFromAnalysis(resp api.AnalyzeResponse) store.Request {
+	saved := 0
+	if resp.PotentialSavings > 0 && resp.InputTokens > 0 {
+		saved = int(math.Round(float64(resp.InputTokens) * resp.PotentialSavings))
+	}
+	if saved > resp.InputTokens {
+		saved = resp.InputTokens
+	}
+	savingsPct := 0.0
+	if resp.InputTokens > 0 {
+		savingsPct = float64(saved) / float64(resp.InputTokens) * 100
+	}
+	return store.Request{
+		Source:          store.SourceManual,
+		Model:           resp.Model,
+		InputTokens:     resp.InputTokens,
+		OptimizedTokens: resp.InputTokens - saved,
+		SavingsPct:      savingsPct,
+		CostUSD:         resp.EstimatedCostUSD,
+		SavingsUSD:      resp.EstimatedSavingsUSD,
+	}
 }
 
 // Apply optimizes a prompt under the given approval flags and returns a
