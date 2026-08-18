@@ -11,8 +11,9 @@ import (
 
 // Request source values stored in the requests.source column.
 const (
-	SourceManual = "manual"
-	SourceProxy  = "proxy"
+	SourceManual      = "manual"
+	SourceProxy       = "proxy"
+	SourceProxyStream = "proxy-stream"
 )
 
 // Store is a SQLite-backed persistence layer for Distilly.

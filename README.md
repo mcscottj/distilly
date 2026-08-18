@@ -33,6 +33,7 @@ and [`memory-bank/`](memory-bank/) for detail.
 ```
 docs/                      Roadmap + architecture overview
 memory-bank/               Agent working memory (progress, patterns, context)
+test-proxy.sh              Curl a non-streaming chat completion through the local proxy
 src/                       Go module + Wails project root
   main.go, app.go          Desktop entry + UI bindings
   cmd/lint/                CLI (distilly-lint)
@@ -96,3 +97,14 @@ go test ./...
 wails doctor
 wails dev
 ```
+
+To exercise the local proxy (not the ChatGPT app — that has no custom base URL),
+start Distilly, **Settings → Start proxy**, then from the repo root:
+
+```bash
+./test-proxy.sh
+```
+
+That POSTs `stream: false` to `http://127.0.0.1:8787/v1/chat/completions`. Open
+**Dashboard** (or click Refresh) to see a `proxy` row. Override the port with
+`DISTILLY_PROXY_PORT` if you changed it in Settings.

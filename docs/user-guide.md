@@ -196,7 +196,7 @@ Appearance changes save immediately (no separate Save click).
 | **Base URL** | Shown as `http://127.0.0.1:<port>/v1` — copy this into your client’s `baseURL`. |
 | **Passthrough mode** | Still analyzes and logs potential savings, but forwards the **original** request body unchanged (no rewrite). |
 
-**Streaming is not supported.** Clients must send `stream: false`. Streaming requests are rejected.
+**Streaming is not supported.** Clients must send `stream: false`. Streaming requests are rejected with 400, but Distilly still logs them on the Dashboard as `proxy-stream` (token counts only; no savings).
 
 Point an SDK at Distilly like:
 
@@ -204,6 +204,24 @@ Point an SDK at Distilly like:
 base URL: http://127.0.0.1:8787/v1
 API key:  (your upstream key, or whatever your client requires — Distilly uses the key from Settings when forwarding)
 ```
+
+The ChatGPT desktop/web app cannot use this URL — it has no custom API endpoint
+and it streams. For a smoke test from the repo root, start the proxy, then:
+
+```bash
+./test-proxy.sh
+```
+
+That sends the same non-streaming `POST /v1/chat/completions` as:
+
+```bash
+curl -sS http://127.0.0.1:8787/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"gpt-4o","stream":false,"messages":[{"role":"user","content":"ping"}]}'
+```
+
+Then open **Dashboard** or click **Refresh**. Override the port with
+`DISTILLY_PROXY_PORT` if it is not `8787`.
 
 #### Optimization defaults
 
@@ -260,6 +278,7 @@ Sample prompts for trying features live under `src/testdata/prompts/`.
 1. In **Settings**, set upstream URL + API key, confirm port, leave passthrough off (unless you only want metrics).  
 2. Set optimization defaults you’re comfortable with.  
 3. **Start proxy**, copy the base URL into your client, disable streaming.  
+   Smoke test from the repo root with `./test-proxy.sh` (not the ChatGPT app).  
 4. Use your app normally; check **Dashboard** for tokens/$ saved.  
 5. Use **Passthrough** when you want measurement without changing what the model sees.
 
