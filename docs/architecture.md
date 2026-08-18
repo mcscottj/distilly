@@ -89,7 +89,7 @@ sequenceDiagram
   participant API as Upstream_OpenAI
 
   Client->>Proxy: POST /v1/chat/completions
-  Proxy->>Proxy: Reject if stream true
+  Proxy->>Proxy: If stream true log proxy-stream and reject
   Proxy->>DB: Load settings key upstream toggles
   Proxy->>Proxy: messages to sectioned prompt
   Proxy->>Lint: Run then Apply
@@ -99,7 +99,7 @@ sequenceDiagram
   API-->>Client: Response via proxy
 ```
 
-**In plain terms:** Your code talks to Distilly as if it were OpenAI. Distilly turns chat messages into a sectioned prompt, cleans it up, turns it back into messages, logs savings, and forwards the slimmed request to the real API. Streaming is rejected today. Native Anthropic Messages API is out of scope for M4 — Claude works only via OpenAI-compatible gateways.
+**In plain terms:** Your code talks to Distilly as if it were OpenAI. Distilly turns chat messages into a sectioned prompt, cleans it up, turns it back into messages, logs savings, and forwards the slimmed request to the real API. Streaming is rejected today (those calls are still logged as `proxy-stream` with no savings). Native Anthropic Messages API is out of scope for M4 — Claude works only via OpenAI-compatible gateways.
 
 Start and stop the proxy from **Settings** (`StartProxy` / `StopProxy` / `GetProxyStatus` on [`src/app.go`](../src/app.go)).
 

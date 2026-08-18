@@ -232,6 +232,7 @@ func (s *Server) handleChatCompletions(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Stream {
+		_ = s.logRejectedStream(req)
 		http.Error(w, "streaming not supported yet; set stream=false", http.StatusBadRequest)
 		return
 	}
@@ -315,6 +316,23 @@ func (s *Server) logRequest(model string, report lint.Report, optimizedTokens in
 		SavingsPct:      savingsPct,
 		CostUSD:         report.EstimatedCostUSD,
 		SavingsUSD:      report.EstimatedSavingsUSD,
+	})
+	return err
+}
+
+func (s *Server) logRejectedStream(req chatRequest) error {
+	if s.store == nil {
+		return nil
+	}
+	report := lint.Run(MessagesToPrompt(req.Messages), req.Model)
+	_, err := s.store.InsertRequest(store.Request{
+		Source:          store.SourceProxyStream,
+		Model:           req.Model,
+		InputTokens:     report.InputTokens,
+		OptimizedTokens: report.InputTokens,
+		SavingsPct:      0,
+		CostUSD:         report.EstimatedCostUSD,
+		SavingsUSD:      0,
 	})
 	return err
 }

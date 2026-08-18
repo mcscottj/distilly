@@ -78,6 +78,30 @@ func TestRejectStreaming(t *testing.T) {
 	if !strings.Contains(rec.Body.String(), "streaming not supported") {
 		t.Fatalf("body = %q, want streaming rejection message", rec.Body.String())
 	}
+
+	recent, err := s.GetRecentRequests(1)
+	if err != nil {
+		t.Fatalf("GetRecentRequests: %v", err)
+	}
+	if len(recent) != 1 {
+		t.Fatalf("logged = %d, want 1 rejected stream row", len(recent))
+	}
+	r := recent[0]
+	if r.Source != store.SourceProxyStream {
+		t.Fatalf("source = %q, want %q", r.Source, store.SourceProxyStream)
+	}
+	if r.Model != "gpt-4" {
+		t.Fatalf("model = %q, want gpt-4", r.Model)
+	}
+	if r.InputTokens <= 0 {
+		t.Fatalf("InputTokens = %d, want > 0", r.InputTokens)
+	}
+	if r.OptimizedTokens != r.InputTokens {
+		t.Fatalf("rejected stream should not claim savings: input=%d optimized=%d", r.InputTokens, r.OptimizedTokens)
+	}
+	if r.SavingsPct != 0 || r.SavingsUSD != 0 {
+		t.Fatalf("rejected stream savings should be 0: pct=%v usd=%v", r.SavingsPct, r.SavingsUSD)
+	}
 }
 
 func TestOptimizeForwardAndLogSavings(t *testing.T) {
