@@ -1,4 +1,4 @@
-![Distilly logo](docs/distilly-logo.png)
+<img src="docs/distilly-logo.png" alt="Distilly logo" width="512">
 
 # distilly
 
