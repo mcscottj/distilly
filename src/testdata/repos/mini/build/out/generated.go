@@ -1,0 +1,3 @@
+package out
+
+func Generated() {}
