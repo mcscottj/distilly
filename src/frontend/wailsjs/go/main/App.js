@@ -42,6 +42,10 @@ export function LogRequest(arg1) {
   return window['go']['main']['App']['LogRequest'](arg1);
 }
 
+export function SelectContext(arg1) {
+  return window['go']['main']['App']['SelectContext'](arg1);
+}
+
 export function SetSetting(arg1, arg2) {
   return window['go']['main']['App']['SetSetting'](arg1, arg2);
 }

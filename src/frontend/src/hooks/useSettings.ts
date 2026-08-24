@@ -15,6 +15,10 @@ export type AppSettings = {
   approveNearDuplicates: boolean
   approveJsonConversion: boolean
   passthrough: boolean
+  repoRoot: string
+  contextMaxDepth: string
+  contextMaxTokens: string
+  enableCodeContext: boolean
 }
 
 const emptySettings = (): AppSettings => ({
@@ -25,6 +29,10 @@ const emptySettings = (): AppSettings => ({
   approveNearDuplicates: false,
   approveJsonConversion: false,
   passthrough: false,
+  repoRoot: '',
+  contextMaxDepth: withSettingDefault(SettingKey.ContextMaxDepth, ''),
+  contextMaxTokens: withSettingDefault(SettingKey.ContextMaxTokens, ''),
+  enableCodeContext: false,
 })
 
 async function loadSettings(): Promise<AppSettings> {
@@ -36,6 +44,10 @@ async function loadSettings(): Promise<AppSettings> {
     near,
     json,
     passthrough,
+    repoRoot,
+    contextMaxDepth,
+    contextMaxTokens,
+    enableCodeContext,
   ] = await Promise.all([
     GetSetting(SettingKey.UpstreamURL),
     GetSetting(SettingKey.ApiKey),
@@ -44,6 +56,10 @@ async function loadSettings(): Promise<AppSettings> {
     GetSetting(SettingKey.ApproveNearDuplicates),
     GetSetting(SettingKey.ApproveJsonConversion),
     GetSetting(SettingKey.Passthrough),
+    GetSetting(SettingKey.RepoRoot),
+    GetSetting(SettingKey.ContextMaxDepth),
+    GetSetting(SettingKey.ContextMaxTokens),
+    GetSetting(SettingKey.EnableCodeContext),
   ])
 
   return {
@@ -54,6 +70,10 @@ async function loadSettings(): Promise<AppSettings> {
     approveNearDuplicates: parseBoolSetting(near),
     approveJsonConversion: parseBoolSetting(json),
     passthrough: parseBoolSetting(passthrough),
+    repoRoot: repoRoot ?? '',
+    contextMaxDepth: withSettingDefault(SettingKey.ContextMaxDepth, contextMaxDepth),
+    contextMaxTokens: withSettingDefault(SettingKey.ContextMaxTokens, contextMaxTokens),
+    enableCodeContext: parseBoolSetting(enableCodeContext),
   }
 }
 
@@ -110,6 +130,21 @@ export function useSettings() {
           serializeBoolSetting(settings.approveJsonConversion),
         ),
         SetSetting(SettingKey.Passthrough, serializeBoolSetting(settings.passthrough)),
+        SetSetting(SettingKey.RepoRoot, settings.repoRoot.trim()),
+        SetSetting(
+          SettingKey.ContextMaxDepth,
+          settings.contextMaxDepth.trim() ||
+            withSettingDefault(SettingKey.ContextMaxDepth, ''),
+        ),
+        SetSetting(
+          SettingKey.ContextMaxTokens,
+          settings.contextMaxTokens.trim() ||
+            withSettingDefault(SettingKey.ContextMaxTokens, ''),
+        ),
+        SetSetting(
+          SettingKey.EnableCodeContext,
+          serializeBoolSetting(settings.enableCodeContext),
+        ),
       ])
       setSettings((prev) => ({ ...prev, upstreamURL: upstream, proxyPort: port }))
       setSavedAt(Date.now())

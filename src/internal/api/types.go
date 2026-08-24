@@ -77,3 +77,37 @@ type StructuredDataBlock struct {
 	JSON   string     `json:"json"`
 	Diff   []DiffLine `json:"diff"`
 }
+
+// SelectContextRequest is the input to SelectContext.
+type SelectContextRequest struct {
+	RepoRoot     string `json:"repoRoot"`
+	SeedFile     string `json:"seedFile"`
+	Question     string `json:"question"`
+	MaxDepth     int    `json:"maxDepth,omitempty"`
+	MaxFiles     int    `json:"maxFiles,omitempty"`
+	MaxTokens    int    `json:"maxTokens,omitempty"`
+	IncludeTests bool   `json:"includeTests"`
+}
+
+// InclusionReasonDTO explains why a file was selected.
+type InclusionReasonDTO struct {
+	Kind   string `json:"kind"`
+	Detail string `json:"detail"`
+}
+
+// SelectedFileDTO is one file in a SelectContextResponse.
+type SelectedFileDTO struct {
+	Path    string               `json:"path"`
+	Tokens  int                  `json:"tokens"`
+	Reasons []InclusionReasonDTO `json:"reasons"`
+}
+
+// SelectContextResponse is the output of SelectContext.
+type SelectContextResponse struct {
+	Files         []SelectedFileDTO `json:"files"`
+	TotalTokens   int               `json:"totalTokens"`
+	ExcludedCount int               `json:"excludedCount"`
+	Warnings      []string          `json:"warnings"`
+	Markdown      string            `json:"markdown"`
+	Error         string            `json:"error,omitempty"`
+}

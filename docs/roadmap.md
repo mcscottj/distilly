@@ -110,3 +110,11 @@ Tasks:
 - Tree-sitter based dependency analysis
 - Given a question about a file, select only relevant files from a repo
   instead of sending the whole thing
+
+Tasks:
+- [x] internal/context: Tree-sitter index, import graph, Select + FormatContext
+- [x] testdata/repos: mini + distilly-snippet fixture modules
+- [x] cmd/context: distilly-context CLI (report / json / markdown)
+- [x] internal/api + desktop Context workspace + Settings fields
+- [x] internal/proxy: @distilly:context marker protocol + tests
+- [x] docs: architecture, user-guide, code-context-fixtures.md

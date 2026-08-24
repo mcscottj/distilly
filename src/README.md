@@ -6,7 +6,8 @@ product status; this file covers working inside `src/`.
 ## Status
 
 M1–M3 CLI/engine work is done. M4 desktop + store + proxy package and
-lifecycle bindings are in place. See
+lifecycle bindings are in place. M5 code-context optimizer (Tree-sitter
+Select, CLI, desktop Context workspace, proxy marker) is in place. See
 [`../docs/architecture.md`](../docs/architecture.md) and
 [`../memory-bank/progress.md`](../memory-bank/progress.md).
 
@@ -14,8 +15,10 @@ lifecycle bindings are in place. See
 
 ```
 cmd/lint/              CLI entrypoint (distilly-lint)
+cmd/context/           CLI entrypoint (distilly-context)
 internal/lint/         Core engine: Run + Apply + score + examples + jsonify
-internal/api/          Wails Analyze/Apply DTOs
+internal/context/      Code context: Select + FormatContext (Tree-sitter)
+internal/api/          Wails Analyze/Apply/SelectContext DTOs
 internal/proxy/        OpenAI-compatible proxy (Start/Stop bound on App)
 internal/store/        SQLite requests + settings
 internal/tokenizer/    Token counting
@@ -24,8 +27,9 @@ internal/history/      History length flagger
 internal/cost/         Token → $ estimation
 internal/diff/         Before/after diff
 internal/regression/   Constraint-survival harness
-frontend/              React Lint / Dashboard / Settings
+frontend/              React Lint / Context / Dashboard / Settings
 testdata/prompts/      Regression fixtures
+testdata/repos/        Code-context fixture modules
 main.go, app.go        Wails entry + bindings
 ```
 
@@ -36,6 +40,7 @@ go run ./cmd/lint testdata/prompts/exact_duplicates.txt
 go run ./cmd/lint -fix testdata/prompts/exact_duplicates.txt
 go run ./cmd/lint -fix -approve-near-duplicates -approve-json-conversion \
   testdata/prompts/near_duplicates.txt
+go run ./cmd/context -repo . -seed internal/lint/apply.go -question "Apply options"
 go test ./...
 ```
 
@@ -47,6 +52,6 @@ wails dev
 wails build    # → build/bin/distilly.app
 ```
 
-Bound on `App` today: `Analyze`, `Apply`, `DiffForDuplicate`, `ListModels`,
+Bound on `App` today: `Analyze`, `Apply`, `SelectContext`, `DiffForDuplicate`, `ListModels`,
 dashboard/settings helpers, `LogRequest`, `StartProxy`, `StopProxy`,
 `GetProxyStatus`.

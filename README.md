@@ -21,11 +21,16 @@ dropping constraints.
 Settings), SQLite persistence, OpenAI-compatible proxy package, and
 `StartProxy` / `StopProxy` / status wired into the App and Settings UI.
 
+**Milestone 5 is done**: Tree-sitter code-context selection (`internal/context`),
+`distilly-context` CLI, desktop Context workspace, and proxy `@distilly:context`
+marker injection.
+
 There is still **no AI rewrite backend** — everything is rule-based Go.
-No CI yet. Milestone 5 (Tree-sitter code-context selection) is not started.
+No CI yet.
 
 See [`docs/roadmap.md`](docs/roadmap.md), [`docs/architecture.md`](docs/architecture.md),
 [`docs/user-guide.md`](docs/user-guide.md), [`docs/prompt-fixtures.md`](docs/prompt-fixtures.md),
+[`docs/code-context-fixtures.md`](docs/code-context-fixtures.md),
 and [`memory-bank/`](memory-bank/) for detail.
 
 ## Project layout
@@ -37,8 +42,10 @@ test-proxy.sh              Curl a non-streaming chat completion through the loca
 src/                       Go module + Wails project root
   main.go, app.go          Desktop entry + UI bindings
   cmd/lint/                CLI (distilly-lint)
+  cmd/context/             CLI (distilly-context)
   internal/lint/           Core engine: Run (report) + Apply (optimize)
-  internal/api/            JSON DTOs for Analyze / Apply
+  internal/context/        Code context: Select + FormatContext
+  internal/api/            JSON DTOs for Analyze / Apply / SelectContext
   internal/proxy/          OpenAI-compatible /v1/chat/completions gateway
   internal/store/          SQLite settings + request metrics
   internal/tokenizer/      Token counting (tiktoken-compatible)
@@ -47,8 +54,9 @@ src/                       Go module + Wails project root
   internal/cost/           Token → $ estimates per model
   internal/diff/           Before/after diff rendering
   internal/regression/     Constraint-survival harness for Apply
-  frontend/                React + Vite + Tailwind (Lint / Dashboard / Settings)
+  frontend/                React + Vite + Tailwind (Lint / Context / Dashboard / Settings)
   testdata/prompts/        Regression fixtures
+  testdata/repos/          Code-context fixture modules
 ```
 
 ## What works today
@@ -63,12 +71,12 @@ src/                       Go module + Wails project root
 - [x] Desktop Lint workspace (analyze / apply / diff / toggles)
 - [x] Dashboard + Settings (SQLite-backed)
 - [x] Proxy package (non-streaming; tested) — start/stop from Settings
+- [x] Code context: CLI, desktop Context workspace, proxy `@distilly:context` marker
 
 ## Later
 
 - History compression (beyond flagging)
 - CI for the regression suite
-- Code context optimizer (Milestone 5 / Tree-sitter)
 - Optional semantic compression via local models (deferred)
 
 ## Tech stack

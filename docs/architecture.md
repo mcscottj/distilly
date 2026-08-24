@@ -21,18 +21,23 @@ flowchart TB
     Store[(SQLite)]
   end
 
-  Engine[lint engine]
+  LintEngine[lint engine]
+  ContextEngine[context engine]
   Proxy[OpenAI-compatible proxy]
   Upstream[Upstream API]
 
   Dev --> UI
-  Dev --> CLI[distilly-lint CLI]
+  Dev --> LintCLI[distilly-lint CLI]
+  Dev --> ContextCLI[distilly-context CLI]
   AppClient --> Proxy
   UI --> App
-  App --> Engine
+  App --> LintEngine
+  App --> ContextEngine
   App --> Store
-  CLI --> Engine
-  Proxy --> Engine
+  LintCLI --> LintEngine
+  ContextCLI --> ContextEngine
+  Proxy --> ContextEngine
+  Proxy --> LintEngine
   Proxy --> Store
   Proxy --> Upstream
 ```
@@ -46,13 +51,14 @@ Prompts are split into **sections** (`System` / `Examples` / `History` / `Questi
 | Area | Path | Role |
 |------|------|------|
 | Desktop entry | [`src/main.go`](../src/main.go), [`src/app.go`](../src/app.go) | Wails lifecycle; binds UI → Go |
-| CLI | [`src/cmd/lint`](../src/cmd/lint) | Headless lint |
+| CLI | [`src/cmd/lint`](../src/cmd/lint), [`src/cmd/context`](../src/cmd/context) | Headless lint + code context |
 | Lint engine | [`src/internal/lint`](../src/internal/lint) | `Run` (report) + `Apply` (optimize) |
-| UI DTOs | [`src/internal/api`](../src/internal/api) | JSON shapes for Analyze/Apply |
-| Proxy | [`src/internal/proxy`](../src/internal/proxy) | `/v1/chat/completions` gateway |
+| Context engine | [`src/internal/context`](../src/internal/context) | `Select` + `FormatContext` (Tree-sitter import graph) |
+| UI DTOs | [`src/internal/api`](../src/internal/api) | JSON shapes for Analyze/Apply/SelectContext |
+| Proxy | [`src/internal/proxy`](../src/internal/proxy) | `/v1/chat/completions` gateway + `@distilly:context` |
 | Persistence | [`src/internal/store`](../src/internal/store) | Settings + request metrics |
 | Helpers | `tokenizer`, `dedupe`, `history`, `cost`, `diff` | Count, find dups, flag history, $, diffs |
-| Frontend | [`src/frontend`](../src/frontend) | Lint / Dashboard / Settings pages |
+| Frontend | [`src/frontend`](../src/frontend) | Lint / Context / Dashboard / Settings |
 
 ## Flow 1 — Manual lint (UI or CLI)
 
@@ -92,6 +98,7 @@ sequenceDiagram
   Proxy->>Proxy: If stream true log proxy-stream and reject
   Proxy->>DB: Load settings key upstream toggles
   Proxy->>Proxy: messages to sectioned prompt
+  Proxy->>Proxy: optional @distilly:context trim
   Proxy->>Lint: Run then Apply
   Proxy->>Proxy: prompt back to messages unless passthrough
   Proxy->>DB: Log source equals proxy
@@ -106,8 +113,9 @@ Start and stop the proxy from **Settings** (`StartProxy` / `StopProxy` / `GetPro
 ## Desktop UI surface
 
 - **Lint workspace** — editor, model picker, score, sections, suggestions, apply + diff
+- **Context workspace** — repo root, seed file, question; selected files table + markdown copy
 - **Dashboard** — aggregate tokens/$ saved, recent requests (from Lint Analyze and proxy logs)
-- **Settings** — upstream URL, API key, proxy port, start/stop/status, approval toggles, passthrough
+- **Settings** — upstream URL, API key, proxy port, start/stop/status, approval toggles, passthrough, code-context defaults
 
 Data lives in SQLite under the user config dir (`…/distilly/distilly.db`).
 
@@ -119,10 +127,31 @@ End-user explanation of every shipped surface (Lint, Dashboard, Settings, CLI, p
 
 Prompt fixtures used for CLI/desktop regression and exploratory coverage are catalogued in [`prompt-fixtures.md`](prompt-fixtures.md) (`src/testdata/prompts/`).
 
+Code-context repo fixtures are catalogued in [`code-context-fixtures.md`](code-context-fixtures.md) (`src/testdata/repos/`).
+
+## Flow 3 — Code context selection
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Surface as CLI_or_Desktop_or_Proxy
+  participant Context as context_engine
+  participant Repo as Go_repo
+
+  User->>Surface: seed file + question (+ repo root)
+  Surface->>Context: Select(options)
+  Context->>Repo: Tree-sitter parse + go.mod resolve
+  Context->>Context: BFS import graph + token budget
+  Context-->>Surface: Selected files + markdown
+  Surface-->>User: report / json / markdown / proxy injection
+```
+
+**In plain terms:** Given a seed `.go` file and a question, Distilly walks the import graph (same-package siblings, direct imports, one-hop reverse importers, depth-limited transitive imports) and returns only the files that matter — formatted as markdown code blocks. The proxy can replace an `@distilly:context` marker in the system message with this output before lint optimization runs.
+
 ## Milestone context
 
 See also [`roadmap.md`](roadmap.md).
 
-- **M1–M3:** CLI lint, regression harness, confidence-tier apply — largely done
+- **M1–M3:** CLI lint, regression harness, confidence-tier apply — done
 - **M4:** Desktop app + SQLite + proxy lifecycle — done
-- **M5 (future):** code-context / Tree-sitter file selection
+- **M5:** Code-context optimizer (Tree-sitter, CLI, desktop workspace, proxy marker) — done
