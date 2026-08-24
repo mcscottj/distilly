@@ -226,6 +226,23 @@ export namespace api {
 		    return a;
 		}
 	}
+	
+	
+	export class InclusionReasonDTO {
+	    kind: string;
+	    detail: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new InclusionReasonDTO(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.kind = source["kind"];
+	        this.detail = source["detail"];
+	    }
+	}
+	
 	export class SelectContextRequest {
 	    repoRoot: string;
 	    seedFile: string;
@@ -248,20 +265,6 @@ export namespace api {
 	        this.maxFiles = source["maxFiles"];
 	        this.maxTokens = source["maxTokens"];
 	        this.includeTests = source["includeTests"];
-	    }
-	}
-	export class InclusionReasonDTO {
-	    kind: string;
-	    detail: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new InclusionReasonDTO(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.kind = source["kind"];
-	        this.detail = source["detail"];
 	    }
 	}
 	export class SelectedFileDTO {
@@ -338,8 +341,6 @@ export namespace api {
 		    return a;
 		}
 	}
-	
-	
 	
 
 }
