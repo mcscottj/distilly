@@ -1,9 +1,10 @@
 import logo from '../assets/distilly-logo.png'
 
-export type AppPage = 'lint' | 'dashboard' | 'settings'
+export type AppPage = 'lint' | 'context' | 'dashboard' | 'settings'
 
 const navItems: { id: AppPage; label: string }[] = [
   { id: 'lint', label: 'Lint' },
+  { id: 'context', label: 'Context' },
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'settings', label: 'Settings' },
 ]

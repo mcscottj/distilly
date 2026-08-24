@@ -134,6 +134,11 @@ func (a *App) Apply(req api.ApplyRequest) api.ApplyResponse {
 	return api.Apply(req)
 }
 
+// SelectContext selects relevant Go files for LLM context from a repo.
+func (a *App) SelectContext(req api.SelectContextRequest) api.SelectContextResponse {
+	return api.SelectContext(req)
+}
+
 // DiffForDuplicate returns a structured diff for one duplicate group.
 func (a *App) DiffForDuplicate(d api.DuplicateGroup) []api.DiffLine {
 	return api.DiffForDuplicate(d)

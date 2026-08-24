@@ -24,6 +24,8 @@ export function ListModels():Promise<Array<string>>;
 
 export function LogRequest(arg1:store.Request):Promise<void>;
 
+export function SelectContext(arg1:api.SelectContextRequest):Promise<api.SelectContextResponse>;
+
 export function SetSetting(arg1:string,arg2:string):Promise<void>;
 
 export function StartProxy():Promise<void>;

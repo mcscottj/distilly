@@ -167,6 +167,11 @@ type runtimeConfig struct {
 	APIKey      string
 	ApplyOpts   lint.ApplyOptions
 	Passthrough bool
+
+	RepoRoot           string
+	CodeContextEnabled bool
+	ContextMaxDepth    int
+	ContextMaxTokens   int
 }
 
 func (s *Server) loadConfig() (runtimeConfig, error) {
@@ -206,6 +211,31 @@ func (s *Server) loadConfig() (runtimeConfig, error) {
 		ApproveJSONConversion: parseBool(jsonConv),
 	}
 	cfg.Passthrough = parseBool(pass)
+
+	repoRoot, err := s.store.GetSetting(SettingRepoRoot)
+	if err != nil {
+		return cfg, err
+	}
+	cfg.RepoRoot = strings.TrimSpace(repoRoot)
+
+	enabled, err := s.store.GetSetting(SettingCodeContextEnabled)
+	if err != nil {
+		return cfg, err
+	}
+	cfg.CodeContextEnabled = parseBool(enabled)
+
+	depth, err := s.store.GetSetting(SettingContextMaxDepth)
+	if err != nil {
+		return cfg, err
+	}
+	cfg.ContextMaxDepth = parseContextIntSetting(depth, DefaultContextMaxDepth)
+
+	maxTok, err := s.store.GetSetting(SettingContextMaxTokens)
+	if err != nil {
+		return cfg, err
+	}
+	cfg.ContextMaxTokens = parseContextIntSetting(maxTok, DefaultContextMaxTokens)
+
 	return cfg, nil
 }
 
@@ -244,6 +274,7 @@ func (s *Server) handleChatCompletions(w http.ResponseWriter, r *http.Request) {
 	}
 
 	prompt := MessagesToPrompt(req.Messages)
+	prompt = applyCodeContext(prompt, cfg)
 	report := lint.Run(prompt, req.Model)
 	optimizedPrompt := lint.Apply(prompt, cfg.ApplyOpts)
 	optimizedTokens := tokenizer.Count(optimizedPrompt)

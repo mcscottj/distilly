@@ -322,6 +322,64 @@ export function Settings() {
           </GroupedRow>
         </GroupedList>
 
+        <GroupedList
+          caption="Code context"
+          footer="Used by the Context workspace and proxy @distilly:context marker. Repo root must point at a Go module."
+        >
+          <GroupedRow
+            label="Repo root"
+            description="Absolute or relative path to the Go module root."
+          >
+            <input
+              type="text"
+              value={settings.repoRoot}
+              onChange={(e) => update('repoRoot', e.target.value)}
+              placeholder="/path/to/repo"
+              disabled={formDisabled}
+              className={fieldClass}
+            />
+          </GroupedRow>
+
+          <GroupedRow
+            label="Enable code context in proxy"
+            description="When on, requests with an @distilly:context marker in the system message get trimmed file context."
+          >
+            <input
+              type="checkbox"
+              checked={settings.enableCodeContext}
+              onChange={(e) => update('enableCodeContext', e.target.checked)}
+              disabled={formDisabled}
+              className={checkboxClass}
+            />
+          </GroupedRow>
+
+          <GroupedRow label="Max import depth">
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={settings.contextMaxDepth}
+              onChange={(e) => update('contextMaxDepth', e.target.value.replace(/[^\d]/g, ''))}
+              placeholder="2"
+              disabled={formDisabled}
+              className={`${fieldClass} sm:ml-auto sm:w-40`}
+            />
+          </GroupedRow>
+
+          <GroupedRow label="Max context tokens">
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={settings.contextMaxTokens}
+              onChange={(e) => update('contextMaxTokens', e.target.value.replace(/[^\d]/g, ''))}
+              placeholder="32000"
+              disabled={formDisabled}
+              className={`${fieldClass} sm:ml-auto sm:w-40`}
+            />
+          </GroupedRow>
+        </GroupedList>
+
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="submit"

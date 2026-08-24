@@ -26,11 +26,15 @@ const checkboxClass =
 type LintWorkspaceProps = {
   preferredModel?: string
   onPreferredModelConsumed?: () => void
+  preferredPrompt?: string
+  onPreferredPromptConsumed?: () => void
 }
 
 export function LintWorkspace({
   preferredModel,
   onPreferredModelConsumed,
+  preferredPrompt,
+  onPreferredPromptConsumed,
 }: LintWorkspaceProps) {
   const {
     models,
@@ -92,6 +96,13 @@ export function LintWorkspace({
       setModel(models[0])
     }
   }, [preferredModel, onPreferredModelConsumed, prefsLoaded, defaultModel, models, model])
+
+  useEffect(() => {
+    if (preferredPrompt) {
+      setPrompt(preferredPrompt)
+      onPreferredPromptConsumed?.()
+    }
+  }, [preferredPrompt, onPreferredPromptConsumed])
   async function onAnalyze(e: FormEvent) {
     e.preventDefault()
     if (!prompt.trim()) return

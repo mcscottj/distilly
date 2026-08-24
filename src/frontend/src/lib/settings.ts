@@ -7,6 +7,10 @@ export const SettingKey = {
   ApproveNearDuplicates: 'approve_near_duplicates',
   ApproveJsonConversion: 'approve_json_conversion',
   Passthrough: 'passthrough',
+  RepoRoot: 'repo_root',
+  ContextMaxDepth: 'context_max_depth',
+  ContextMaxTokens: 'context_max_tokens',
+  EnableCodeContext: 'enable_code_context',
   Theme: 'theme',
   ThemeContrast: 'theme_contrast',
   UiFontScale: 'ui_font_scale',
@@ -23,6 +27,10 @@ export const SETTING_DEFAULTS: Record<SettingKeyName, string> = {
   [SettingKey.ApproveNearDuplicates]: 'false',
   [SettingKey.ApproveJsonConversion]: 'false',
   [SettingKey.Passthrough]: 'false',
+  [SettingKey.RepoRoot]: '',
+  [SettingKey.ContextMaxDepth]: '2',
+  [SettingKey.ContextMaxTokens]: '32000',
+  [SettingKey.EnableCodeContext]: 'false',
   [SettingKey.Theme]: 'light',
   [SettingKey.ThemeContrast]: 'normal',
   [SettingKey.UiFontScale]: 'default',
@@ -41,7 +49,7 @@ export function serializeBoolSetting(value: boolean): string {
 export function withSettingDefault(key: SettingKeyName, value: string | null | undefined): string {
   if (value == null || value === '') {
     // Keep empty for secrets / optional selectors; apply defaults only when meaningful.
-    if (key === SettingKey.ApiKey || key === SettingKey.DefaultModel) {
+    if (key === SettingKey.ApiKey || key === SettingKey.DefaultModel || key === SettingKey.RepoRoot) {
       return ''
     }
     return SETTING_DEFAULTS[key]

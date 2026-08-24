@@ -12,9 +12,9 @@ This guide covers what the product does **today** (desktop app, CLI, and local p
 
 | Surface | What it’s for |
 |---------|----------------|
-| **Desktop app** | Paste a prompt, see score and suggestions, preview a rewrite, manage proxy and settings |
-| **CLI** (`distilly-lint`) | Lint or fix a prompt file from the terminal |
-| **Local proxy** | Point an OpenAI-compatible client at Distilly; it optimizes chat requests before forwarding upstream |
+| **Desktop app** | Paste a prompt, see score and suggestions, preview a rewrite, select code context, manage proxy and settings |
+| **CLI** (`distilly-lint`, `distilly-context`) | Lint or fix a prompt file; select relevant Go files for LLM context |
+| **Local proxy** | Point an OpenAI-compatible client at Distilly; it optimizes chat requests (and optional code context) before forwarding upstream |
 
 There is **no AI rewrite backend**. Near-duplicate detection and JSON conversion are rule-based heuristics that require your approval.
 
@@ -34,6 +34,9 @@ go run ./cmd/lint testdata/prompts/exact_duplicates.txt
 
 # CLI — rewrite (exact duplicates only by default)
 go run ./cmd/lint -fix testdata/prompts/exact_duplicates.txt
+
+# CLI — code context report
+go run ./cmd/context -repo . -seed internal/lint/apply.go -question "why reject streaming?"
 ```
 
 Settings and request metrics are stored in SQLite under your user config directory (typically `…/distilly/distilly.db`). Secrets and preferences never leave this machine unless you configure an upstream API for the proxy.
@@ -126,7 +129,7 @@ When in doubt: Analyze and Preview apply with toggles **off**, read the before/a
 
 ## Desktop app
 
-The sidebar has three pages: **Lint**, **Dashboard**, and **Settings**.
+The sidebar has four pages: **Lint**, **Context**, **Dashboard**, and **Settings**.
 
 ### Lint workspace
 
@@ -146,6 +149,23 @@ Paste a full prompt, analyze it, then preview an optimized version.
 Toggles in the workspace are initialized from **Settings → Optimization defaults**, but changing them on this page only affects the current session’s Apply (and re-runs Apply if a preview is already open). Save Settings if you want those defaults next launch.
 
 **Analyze vs Apply:** Analyze reports. Apply rewrites. You can Analyze without applying, or Preview apply without copying the result into the editor.
+
+### Context workspace
+
+Select relevant Go source files for LLM context from a repo — deterministic import-graph analysis (Tree-sitter + `go.mod` resolution), no embeddings.
+
+| Control | What it does |
+|---------|----------------|
+| **Repo root** | Path to the Go module root. Defaults from Settings → Code context when set. |
+| **Seed file** | Repo-relative `.go` file to start from (e.g. `internal/proxy/proxy.go`). |
+| **Question** | Guides symbol-name matching for low-priority files. |
+| **Max depth / Max tokens** | Import hop limit and token budget. Defaults from Settings. |
+| **Include test files** | When checked, includes `*_test.go` siblings and imports. |
+| **Select context** | Runs selection; shows a table of paths, token counts, and inclusion reasons. |
+| **Copy markdown** | Copies formatted `### path` + fenced Go blocks ready to paste into a prompt. |
+| **Open in Lint** | Sends the markdown into the Lint workspace editor for further analysis. |
+
+High- and medium-priority files (seed, same package, direct imports, reverse importers) are always included. Low-priority transitive imports are dropped when the token or file budget is exceeded.
 
 ### Dashboard
 
@@ -232,7 +252,16 @@ Then open **Dashboard** or click **Refresh**. Override the port with
 
 Exact duplicates always apply. These two stay off unless you opt in — same policy as the CLI flags.
 
-Click **Save settings** to persist Upstream, Local proxy, and Optimization defaults.
+#### Code context
+
+| Setting | What it does |
+|---------|----------------|
+| **Repo root** | Default Go module path for the Context workspace and proxy. |
+| **Enable code context in proxy** | When on, requests with an `@distilly:context` marker get file selection injected (see below). |
+| **Max import depth** | Transitive import hops (default `2`). |
+| **Max context tokens** | Token budget for selected files (default `32000`). |
+
+Click **Save settings** to persist Upstream, Local proxy, Optimization defaults, and Code context.
 
 ---
 
@@ -261,6 +290,32 @@ go run ./cmd/lint -fix -approve-near-duplicates -approve-json-conversion \
 
 Sample prompts for trying features live under `src/testdata/prompts/`.
 
+### `distilly-context`
+
+```bash
+go run ./cmd/context -repo <path> -seed <repo-relative.go> [flags]
+```
+
+| Flag | Effect |
+|------|--------|
+| `-repo` | Repository root (default `.`) |
+| `-seed` | **Required.** Repo-relative seed file |
+| `-question` | Question for symbol matching |
+| `-max-depth` | Import graph depth (default `2`) |
+| `-max-files` | File cap (default `20`) |
+| `-max-tokens` | Token budget (default `32000`; `0` = no cap) |
+| `-include-tests` | Include `*_test.go` files |
+| `-format` | `report` (default), `json`, or `markdown` |
+
+Examples:
+
+```bash
+go run ./cmd/context -repo testdata/repos/mini -seed a/a.go -question "how does A call B?"
+go run ./cmd/context -repo . -seed internal/proxy/proxy.go -format markdown
+```
+
+Miniature repo fixtures are documented in [code-context-fixtures.md](code-context-fixtures.md).
+
 ---
 
 ## Typical workflows
@@ -286,6 +341,39 @@ Sample prompts for trying features live under `src/testdata/prompts/`.
 
 Use the CLI report on checked-in prompt files. Pair with fixtures under `testdata/prompts/` when you want known waste patterns.
 
+### 4. Trim repo context for a coding question
+
+1. Open **Context**, set repo root and seed file, enter your question.  
+2. Click **Select context**, review the file table and token total.  
+3. **Copy markdown** or **Open in Lint** to analyze token weight before sending upstream.  
+4. For automated proxy injection, enable code context in Settings and add a marker to the system message (see below).
+
+---
+
+## Proxy code context marker
+
+When **Enable code context in proxy** is on and **Repo root** is set, embed this in a `role: system` message:
+
+```text
+@distilly:context
+seed=internal/proxy/proxy.go
+```
+
+Distilly replaces the entire marker block (through the next blank line) with markdown code blocks for selected files. The user's last message becomes the selection question. Without the marker, the proxy does not auto-select files — even when the setting is enabled.
+
+Example system message:
+
+```text
+You are a senior Go engineer reviewing this codebase.
+
+@distilly:context
+seed=internal/proxy/proxy.go
+
+Always cite file paths in your answer.
+```
+
+After optimization, the forwarded request contains the selected file contents instead of the marker.
+
 ---
 
 ## What Distilly does *not* do yet
@@ -293,7 +381,6 @@ Use the CLI report on checked-in prompt files. Pair with fixtures under `testdat
 - Summarize or rewrite long conversation history (it only flags it)  
 - Stream chat completions through the proxy  
 - Call a local or cloud model to “semantically compress” prompts  
-- Speak Anthropic’s native Messages API (Claude works only via OpenAI-compatible gateways)  
-- Automatically pick relevant code files from a repo (roadmap Milestone 5)
+- Speak Anthropic’s native Messages API (Claude works only via OpenAI-compatible gateways)
 
 For internals and milestone status, see [architecture.md](architecture.md) and [roadmap.md](roadmap.md).

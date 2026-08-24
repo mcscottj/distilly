@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { store } from '../wailsjs/go/models'
 import { SidebarNav, type AppPage } from './components/SidebarNav'
+import { ContextWorkspace } from './pages/ContextWorkspace'
 import { Dashboard } from './pages/Dashboard'
 import { LintWorkspace } from './pages/LintWorkspace'
 import { Settings } from './pages/Settings'
@@ -8,11 +9,17 @@ import { Settings } from './pages/Settings'
 function App() {
   const [page, setPage] = useState<AppPage>('lint')
   const [lintModel, setLintModel] = useState<string | undefined>(undefined)
+  const [lintPrompt, setLintPrompt] = useState<string | undefined>(undefined)
 
   function openRequestInLint(request: store.Request) {
     if (request.model) {
       setLintModel(request.model)
     }
+    setPage('lint')
+  }
+
+  function openContextInLint(markdown: string) {
+    setLintPrompt(markdown)
     setPage('lint')
   }
 
@@ -24,7 +31,15 @@ function App() {
           <LintWorkspace
             preferredModel={lintModel}
             onPreferredModelConsumed={() => setLintModel(undefined)}
+            preferredPrompt={lintPrompt}
+            onPreferredPromptConsumed={() => setLintPrompt(undefined)}
           />
+        </div>
+        <div
+          className={page === 'context' ? undefined : 'hidden'}
+          aria-hidden={page !== 'context'}
+        >
+          <ContextWorkspace onOpenInLint={openContextInLint} />
         </div>
         <div
           className={page === 'dashboard' ? undefined : 'hidden'}
