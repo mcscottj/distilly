@@ -39,7 +39,10 @@ function App() {
           className={page === 'context' ? undefined : 'hidden'}
           aria-hidden={page !== 'context'}
         >
-          <ContextWorkspace onOpenInLint={openContextInLint} />
+          <ContextWorkspace
+            active={page === 'context'}
+            onOpenInLint={openContextInLint}
+          />
         </div>
         <div
           className={page === 'dashboard' ? undefined : 'hidden'}
