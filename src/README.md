@@ -35,6 +35,19 @@ main.go, app.go        Wails entry + bindings
 
 ## CLI
 
+### Install (run from anywhere)
+
+From the repo root:
+
+```bash
+go install -C src -o "$(go env GOPATH)/bin/distilly-lint" ./cmd/lint
+go install -C src -o "$(go env GOPATH)/bin/distilly-context" ./cmd/context
+```
+
+Add `$(go env GOPATH)/bin` to your `PATH` if needed. Re-run after CLI changes.
+
+### Development (`go run` from `src/`)
+
 ```bash
 go run ./cmd/lint testdata/prompts/exact_duplicates.txt
 go run ./cmd/lint -fix testdata/prompts/exact_duplicates.txt
