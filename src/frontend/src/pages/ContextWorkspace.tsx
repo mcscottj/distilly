@@ -18,6 +18,7 @@ const checkboxClass =
   'size-4 rounded border-hairline bg-fill text-accent focus:ring-accent'
 
 type ContextWorkspaceProps = {
+  active?: boolean
   onOpenInLint?: (markdown: string) => void
 }
 
@@ -33,7 +34,7 @@ function formatReasons(reasons: { kind: string; detail: string }[]): string {
     .join('; ')
 }
 
-export function ContextWorkspace({ onOpenInLint }: ContextWorkspaceProps) {
+export function ContextWorkspace({ active = true, onOpenInLint }: ContextWorkspaceProps) {
   const { result, loading, error, select, clearResults } = useContextSelect()
 
   const [repoRoot, setRepoRoot] = useState('')
@@ -46,12 +47,14 @@ export function ContextWorkspace({ onOpenInLint }: ContextWorkspaceProps) {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
+    if (!active) return
+
     let cancelled = false
+    setPrefsLoaded(false)
     Promise.all([
       GetSetting(SettingKey.RepoRoot),
       GetSetting(SettingKey.ContextMaxDepth),
       GetSetting(SettingKey.ContextMaxTokens),
-      GetSetting(SettingKey.EnableCodeContext),
     ])
       .then(([root, depth, tokens]) => {
         if (cancelled) return
@@ -66,7 +69,7 @@ export function ContextWorkspace({ onOpenInLint }: ContextWorkspaceProps) {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [active])
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
