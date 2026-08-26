@@ -87,7 +87,34 @@ src/                       Go module + Wails project root
 
 ## Getting started
 
-Commands run from `src/` (Go module root):
+### Install the CLI (optional)
+
+To run `distilly-lint` and `distilly-context` from any directory, install once
+from the repo root (Go 1.20+):
+
+```bash
+go install -C src -o "$(go env GOPATH)/bin/distilly-lint" ./cmd/lint
+go install -C src -o "$(go env GOPATH)/bin/distilly-context" ./cmd/context
+```
+
+Ensure `$(go env GOPATH)/bin` (usually `~/go/bin`) is on your `PATH` — e.g. add
+`export PATH="$(go env GOPATH)/bin:$PATH"` to `~/.zshrc`. Re-run the install
+commands after pulling CLI changes.
+
+Then, from anywhere:
+
+```bash
+distilly-lint /path/to/prompt.txt
+distilly-context -repo /path/to/repo -seed internal/lint/apply.go -question "..."
+```
+
+The `-o` names are required; a plain `go install ./cmd/lint` would produce
+`lint`, not `distilly-lint`. See [`docs/user-guide.md`](docs/user-guide.md#cli)
+for flags and examples.
+
+### Development commands
+
+Commands below run from `src/` (Go module root):
 
 ```bash
 # Lint a prompt file (report)

@@ -22,7 +22,9 @@ There is **no AI rewrite backend**. Near-duplicate detection and JSON conversion
 
 ## Getting started
 
-Commands run from the `src/` directory (Go module / Wails root):
+Commands run from the `src/` directory (Go module / Wails root). To install
+`distilly-lint` and `distilly-context` on your `PATH` instead, see
+[CLI → Install](#install).
 
 ```bash
 # Desktop app
@@ -266,6 +268,44 @@ Click **Save settings** to persist Upstream, Local proxy, Optimization defaults,
 ---
 
 ## CLI
+
+### Install
+
+Install once from the repo root so you can call the CLIs from any directory
+(Go 1.20+):
+
+```bash
+go install -C src -o "$(go env GOPATH)/bin/distilly-lint" ./cmd/lint
+go install -C src -o "$(go env GOPATH)/bin/distilly-context" ./cmd/context
+```
+
+Ensure `$(go env GOPATH)/bin` (typically `~/go/bin`) is on your `PATH`:
+
+```bash
+export PATH="$(go env GOPATH)/bin:$PATH"   # add to ~/.zshrc to persist
+```
+
+The `-o` flag sets the binary name. Without it, `go install ./cmd/lint` would
+install `lint`, not `distilly-lint`.
+
+Re-run the install commands after pulling changes that touch `cmd/lint` or
+`cmd/context`.
+
+Examples after install:
+
+```bash
+distilly-lint /path/to/prompt.txt
+distilly-lint -fix -approve-near-duplicates /path/to/prompt.txt
+
+distilly-context -repo /path/to/repo -seed internal/lint/apply.go -question "why reject streaming?"
+distilly-context -repo /path/to/repo -seed internal/lint/apply.go -format markdown
+```
+
+When working inside the repo without installing, use `go run` from `src/` (see
+below). For `distilly-context`, pass an absolute `-repo` path when your shell
+is not already in that repository.
+
+### `distilly-lint`
 
 ```bash
 go run ./cmd/lint [flags] <prompt-file>
