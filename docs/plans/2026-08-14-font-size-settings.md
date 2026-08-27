@@ -8,7 +8,7 @@
 
 **Tech Stack:** React 19, TypeScript, Tailwind CSS v4, Vitest, Wails `GetSetting` / `SetSetting` (SQLite).
 
-**Spec:** [`docs/superpowers/specs/2026-08-14-font-size-settings-design.md`](../specs/2026-08-14-font-size-settings-design.md)
+**Spec:** [`docs/specs/2026-08-14-font-size-settings-design.md`](../specs/2026-08-14-font-size-settings-design.md)
 
 ## Global Constraints
 

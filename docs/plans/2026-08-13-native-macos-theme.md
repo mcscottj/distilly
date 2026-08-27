@@ -8,7 +8,7 @@
 
 **Tech Stack:** Wails v2, React 19, Vite 7, Tailwind CSS v4, TypeScript, SQLite settings via existing `GetSetting` / `SetSetting`, Vitest for pure theme helpers.
 
-**Spec:** [`docs/superpowers/specs/2026-08-13-native-macos-theme-design.md`](../specs/2026-08-13-native-macos-theme-design.md)
+**Spec:** [`docs/specs/2026-08-13-native-macos-theme-design.md`](../specs/2026-08-13-native-macos-theme-design.md)
 
 ## Global Constraints
 
