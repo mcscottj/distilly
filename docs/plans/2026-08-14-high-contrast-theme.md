@@ -8,7 +8,7 @@
 
 **Tech Stack:** React 19, TypeScript, Tailwind CSS v4 tokens in `style.css`, Vitest, Wails `GetSetting` / `SetSetting` (SQLite).
 
-**Spec:** [`docs/superpowers/specs/2026-08-14-high-contrast-theme-design.md`](../specs/2026-08-14-high-contrast-theme-design.md)
+**Spec:** [`docs/specs/2026-08-14-high-contrast-theme-design.md`](../specs/2026-08-14-high-contrast-theme-design.md)
 
 ## Global Constraints
 
