@@ -65,8 +65,9 @@ Desktop app and both CLIs import this package only; no duplicated version litera
 - `go run ./internal/version/cmd/bump` (from `src/`) writes the new VERSION and updates `wails.json` `info.productName` / `info.productVersion`.
 - Repo-root scripts:
   - `scripts/bump-version.sh` — runs the bump command.
-  - `scripts/build-desktop.sh` — bump, then `wails build` from `src/` with release ldflags.
-  - `scripts/build-cli.sh` — bump once, then `go build` both CLIs with release ldflags.
+- `scripts/build-desktop.sh` — `wails build` from `src/` with release ldflags (**no bump**).
+- `scripts/build-cli.sh` — `go build` both CLIs with release ldflags (**no bump**).
+- `scripts/build-release.sh` — bump **once**, then desktop + both CLIs (keeps versions in sync).
 
 README / `src/README.md`: use these scripts when a rebuild should mint a new version; do not bump on casual `wails dev`.
 

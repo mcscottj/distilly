@@ -66,19 +66,19 @@ wails doctor   # CLI often at ~/go/bin/wails
 wails dev      # About shows VERSION+dev; does not bump
 ```
 
-For a versioned release build from the repo root:
+For a versioned release build from the repo root (one bump, desktop + CLIs):
 
 ```bash
-./scripts/build-desktop.sh   # bumps YYYYMMDD.N, then wails build
+./scripts/build-release.sh
 ```
 
 **Distilly → About Distilly** shows `Version <string>`.
 
 ## Version
 
-Source of truth: `internal/version/VERSION`. CLIs: `-version`. Release builds
-use `./scripts/build-cli.sh` / `./scripts/build-desktop.sh` (auto-bump + no
-`+dev` suffix).
+Source of truth: `internal/version/VERSION`. CLIs: `-version`. Prefer
+`./scripts/build-release.sh` so desktop and CLIs share one bump. Individual
+`build-desktop.sh` / `build-cli.sh` build only (no bump).
 
 Bound on `App` today: `Analyze`, `Apply`, `SelectContext`, `DiffForDuplicate`, `ListModels`,
 dashboard/settings helpers, `LogRequest`, `StartProxy`, `StopProxy`,

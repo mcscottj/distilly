@@ -118,17 +118,23 @@ ldflags).
 
 ### Versioned release builds
 
-Each intentional rebuild that should mint a new version:
+Bump once and build desktop + both CLIs with the same `YYYYMMDD.N`:
 
 ```bash
-./scripts/build-desktop.sh   # bumps VERSION, then wails build (no +dev)
-./scripts/build-cli.sh       # bumps VERSION, then builds both CLIs
-./scripts/bump-version.sh    # bump only
+./scripts/build-release.sh
 ```
 
-Version lives in `src/internal/version/VERSION` (`YYYYMMDD.N`). Dev runs
-(`wails dev`, `go run`) show `…+dev` and do not bump. Desktop: **Distilly →
-About Distilly** shows the same version string.
+Or step by step (no second bump between builds):
+
+```bash
+./scripts/bump-version.sh      # increment VERSION + wails.json
+./scripts/build-desktop.sh     # wails build (no bump)
+./scripts/build-cli.sh         # both CLIs (no bump)
+```
+
+Version lives in `src/internal/version/VERSION`. Dev runs (`wails dev`, `go run`)
+show `…+dev` and do not bump. Desktop: **Distilly → About Distilly** shows the
+same version string.
 
 ### Development commands
 
