@@ -27,6 +27,7 @@ internal/history/      History length flagger
 internal/cost/         Token → $ estimation
 internal/diff/         Before/after diff
 internal/regression/   Constraint-survival harness
+internal/version/      YYYYMMDD.N + bump helpers
 frontend/              React Lint / Context / Dashboard / Settings
 testdata/prompts/      Regression fixtures
 testdata/repos/        Code-context fixture modules
@@ -49,6 +50,7 @@ Add `$(go env GOPATH)/bin` to your `PATH` if needed. Re-run after CLI changes.
 ### Development (`go run` from `src/`)
 
 ```bash
+go run ./cmd/lint -version
 go run ./cmd/lint testdata/prompts/exact_duplicates.txt
 go run ./cmd/lint -fix testdata/prompts/exact_duplicates.txt
 go run ./cmd/lint -fix -approve-near-duplicates -approve-json-conversion \
@@ -61,9 +63,22 @@ go test ./...
 
 ```bash
 wails doctor   # CLI often at ~/go/bin/wails
-wails dev
-wails build    # → build/bin/distilly.app
+wails dev      # About shows VERSION+dev; does not bump
 ```
+
+For a versioned release build from the repo root:
+
+```bash
+./scripts/build-desktop.sh   # bumps YYYYMMDD.N, then wails build
+```
+
+**Distilly → About Distilly** shows `Version <string>`.
+
+## Version
+
+Source of truth: `internal/version/VERSION`. CLIs: `-version`. Release builds
+use `./scripts/build-cli.sh` / `./scripts/build-desktop.sh` (auto-bump + no
+`+dev` suffix).
 
 Bound on `App` today: `Analyze`, `Apply`, `SelectContext`, `DiffForDuplicate`, `ListModels`,
 dashboard/settings helpers, `LogRequest`, `StartProxy`, `StopProxy`,
