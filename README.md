@@ -116,6 +116,11 @@ for flags and examples.
 (`YYYYMMDD.N`, or `…+dev` for local `go run` / `go install` without release
 ldflags).
 
+For Cursor (or similar) agents, prefer a **project rule or skill that invokes
+these CLIs** (or the local proxy) rather than asking the model to compress
+prompts itself — see
+[Typical workflows → Wire Distilly into an AI agent](docs/user-guide.md#5-wire-distilly-into-an-ai-agent-rule-or-skill).
+
 ### Versioned release builds
 
 Bump once and build desktop + both CLIs with the same `YYYYMMDD.N`:

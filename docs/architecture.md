@@ -2,11 +2,13 @@
 
 **Distilly** is a local-first “ESLint for prompts”: it analyzes LLM prompts, finds waste (duplicates, bloated history, verbose structured text), estimates token/cost impact, and can deterministically rewrite prompts without changing meaning. No AI rewrite backend in v1 — the engine is rule-based Go code.
 
-You interact with it in three ways:
+You interact with it in three primary ways (plus an optional agent on-ramp):
 
 1. **Desktop app** (Wails: Go + React) — paste a prompt, analyze, apply fixes, see dashboard/settings
 2. **CLI** (`distilly-lint`) — lint a prompt file from the terminal
 3. **Local proxy** (OpenAI-compatible) — point your app at `localhost:8787`; Distilly optimizes chat requests before forwarding upstream
+
+For coding agents, a **project rule or skill** should call those surfaces (CLI/proxy), not reimplement Distilly’s heuristics. See [user-guide.md](user-guide.md#5-wire-distilly-into-an-ai-agent-rule-or-skill).
 
 ```mermaid
 flowchart TB
