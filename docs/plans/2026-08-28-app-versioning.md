@@ -121,7 +121,7 @@ Run: `cd src && go test ./internal/version/ -v`
 ### Task 5: Build scripts + docs
 
 **Files:**
-- Create: `scripts/bump-version.sh`, `scripts/build-desktop.sh`, `scripts/build-cli.sh`
+- Create: `scripts/bump-version.sh`, `scripts/build-desktop.sh`, `scripts/build-cli.sh`, `scripts/build-release.sh`
 - Modify: `README.md`, `src/README.md`, `docs/user-guide.md` (CLI `-version` one-liner)
 
 - [ ] **Step 1: Scripts call bump then build with** `-ldflags "-X distilly/internal/version.release=1"` (wails: pass via `-ldflags` or env Wails supports)

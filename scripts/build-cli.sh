@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# Auto-bump version, then build distilly-lint and distilly-context (release, no +dev).
+# Build distilly-lint and distilly-context only (no version bump). Release (no +dev).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-"$ROOT/scripts/bump-version.sh"
 cd "$ROOT/src"
 OUT="${DISTILLY_CLI_OUT:-$ROOT/src/build/bin}"
 mkdir -p "$OUT"
