@@ -10,5 +10,9 @@
   "author": {
     "name": "Distilly",
     "email": ""
+  },
+  "info": {
+    "productName": "Distilly",
+    "productVersion": "20260828.1"
   }
 }
