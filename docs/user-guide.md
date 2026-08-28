@@ -313,6 +313,7 @@ go run ./cmd/lint [flags] <prompt-file>
 
 | Flag | Effect |
 |------|--------|
+| `-version` | Print version (`YYYYMMDD.N` or `…+dev`) and exit |
 | *(none)* | Print the lint report (tokens, findings, suggestions, potential savings) |
 | `-model <name>` | Include USD estimates for a known model |
 | `-fix` | Print the optimized prompt instead of the report |
@@ -338,6 +339,7 @@ go run ./cmd/context -repo <path> -seed <repo-relative.go> [flags]
 
 | Flag | Effect |
 |------|--------|
+| `-version` | Print version (`YYYYMMDD.N` or `…+dev`) and exit |
 | `-repo` | Repository root (default `.`) |
 | `-seed` | **Required.** Repo-relative seed file |
 | `-question` | Question for symbol matching |

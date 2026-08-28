@@ -112,6 +112,24 @@ The `-o` names are required; a plain `go install ./cmd/lint` would produce
 `lint`, not `distilly-lint`. See [`docs/user-guide.md`](docs/user-guide.md#cli)
 for flags and examples.
 
+`distilly-lint -version` / `distilly-context -version` print the build version
+(`YYYYMMDD.N`, or `…+dev` for local `go run` / `go install` without release
+ldflags).
+
+### Versioned release builds
+
+Each intentional rebuild that should mint a new version:
+
+```bash
+./scripts/build-desktop.sh   # bumps VERSION, then wails build (no +dev)
+./scripts/build-cli.sh       # bumps VERSION, then builds both CLIs
+./scripts/bump-version.sh    # bump only
+```
+
+Version lives in `src/internal/version/VERSION` (`YYYYMMDD.N`). Dev runs
+(`wails dev`, `go run`) show `…+dev` and do not bump. Desktop: **Distilly →
+About Distilly** shows the same version string.
+
 ### Development commands
 
 Commands below run from `src/` (Go module root):
