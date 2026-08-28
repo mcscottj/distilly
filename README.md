@@ -112,6 +112,11 @@ The `-o` names are required; a plain `go install ./cmd/lint` would produce
 `lint`, not `distilly-lint`. See [`docs/user-guide.md`](docs/user-guide.md#cli)
 for flags and examples.
 
+For Cursor (or similar) agents, prefer a **project rule or skill that invokes
+these CLIs** (or the local proxy) rather than asking the model to compress
+prompts itself — see
+[Typical workflows → Wire Distilly into an AI agent](docs/user-guide.md#5-wire-distilly-into-an-ai-agent-rule-or-skill).
+
 ### Development commands
 
 Commands below run from `src/` (Go module root):

@@ -4,7 +4,7 @@ Distilly is a local-first prompt linter and optimizer. It finds waste in LLM pro
 
 Think of it as ESLint for prompts: deterministic rules, explicit opt-ins for riskier changes, everything stays on your machine.
 
-This guide covers what the product does **today** (desktop app, CLI, and local proxy).
+This guide covers what the product does **today** (desktop app, CLI, local proxy, and how to wire those into AI agent rules or skills).
 
 ---
 
@@ -15,8 +15,9 @@ This guide covers what the product does **today** (desktop app, CLI, and local p
 | **Desktop app** | Paste a prompt, see score and suggestions, preview a rewrite, select code context, manage proxy and settings |
 | **CLI** (`distilly-lint`, `distilly-context`) | Lint or fix a prompt file; select relevant Go files for LLM context |
 | **Local proxy** | Point an OpenAI-compatible client at Distilly; it optimizes chat requests (and optional code context) before forwarding upstream |
+| **Agent rule or skill** | Point Cursor (or similar) agents at the CLI/proxy so they run Distilly instead of guessing at token waste |
 
-There is **no AI rewrite backend**. Near-duplicate detection and JSON conversion are rule-based heuristics that require your approval.
+There is **no AI rewrite backend**. Near-duplicate detection and JSON conversion are rule-based heuristics that require your approval. Distilly itself stays the engine — a rule or skill should **invoke** it, not restate its heuristics in prose.
 
 ---
 
@@ -387,6 +388,50 @@ Use the CLI report on checked-in prompt files. Pair with fixtures under `testdat
 2. Click **Select context**, review the file table and token total.  
 3. **Copy markdown** or **Open in Lint** to analyze token weight before sending upstream.  
 4. For automated proxy injection, enable code context in Settings and add a marker to the system message (see below).
+
+### 5. Wire Distilly into an AI agent (rule or skill)
+
+Use a **project rule** or **agent skill** when you want coding agents to call Distilly automatically. Keep the heavy lifting in Distilly; the rule/skill only says *when* and *how* to run it.
+
+**Install the CLIs first** (see [CLI → Install](#install)) so the agent can find `distilly-lint` and `distilly-context` on `PATH`.
+
+| Prefer… | When… |
+|---------|--------|
+| **Rule** | Always-on hygiene for this repo (e.g. lint prompt files before committing; prefer `distilly-context` over dumping whole packages) |
+| **Skill** | A named workflow the agent loads on demand (e.g. “optimize this prompt”, “select Go context for this question”) |
+| **Proxy** | The agent or tool already speaks OpenAI chat completions and you want every request optimized without per-call CLI steps |
+
+Suggested behaviors to encode (adapt wording to your agent product):
+
+1. Before sending a large or reused prompt file upstream, run `distilly-lint` on it; with `-fix`, only add `-approve-near-duplicates` / `-approve-json-conversion` when the user explicitly wants those tiers.  
+2. When gathering Go source for an LLM, run `distilly-context` with a seed file and question; prefer its markdown output over pasting entire directories.  
+3. Do **not** ask another model to “compress” or rewrite the prompt — Distilly is deterministic and cheaper for that job.  
+4. If the local proxy is running, prefer its base URL (`http://127.0.0.1:8787/v1` by default) with `stream: false` for OpenAI-compatible calls.
+
+Example **Cursor project rule** (`.cursor/rules/distilly.mdc` or equivalent):
+
+```markdown
+# Distilly
+
+When optimizing prompts or selecting Go code for LLM context, use Distilly —
+do not invent your own trim/dedupe pass.
+
+- Prompt files: `distilly-lint <file>`; rewrite only with
+  `distilly-lint -fix …` and approval flags the user asked for.
+- Go context: `distilly-context -repo <root> -seed <path.go> -question "…"
+  -format markdown`.
+- Prefer the local Distilly proxy for OpenAI-compatible calls when it is running
+  (`stream: false`).
+```
+
+Example **skill** trigger description (put the same commands in the skill body):
+
+```text
+Use when optimizing LLM prompts, trimming duplicate instructions, estimating
+token waste, or selecting focused Go source for model context via Distilly.
+```
+
+Rules and skills do not replace the desktop app, CLI, or proxy — they are how agents discover and run those surfaces.
 
 ---
 
