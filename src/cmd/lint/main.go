@@ -10,18 +10,25 @@ import (
 	"os"
 
 	"distilly/internal/lint"
+	"distilly/internal/version"
 )
 
 func main() {
+	showVersion := flag.Bool("version", false, "print version and exit")
 	model := flag.String("model", "", "model name to estimate USD cost against (see internal/cost.Table)")
 	fix := flag.Bool("fix", false, "print the optimized prompt instead of the lint report (exact duplicates only, unless -approve-near-duplicates/-approve-json-conversion are set)")
 	approveNearDuplicates := flag.Bool("approve-near-duplicates", false, "with -fix, also collapse near-duplicate instructions/examples — review the report's near-duplicate diff first")
 	approveJSONConversion := flag.Bool("approve-json-conversion", false, "with -fix, also convert detected structured-data lines to JSON — review the report's structured-data diff first")
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: distilly-lint [-model gpt-4] [-fix [-approve-near-duplicates] [-approve-json-conversion]] <prompt-file>")
+		fmt.Fprintln(os.Stderr, "usage: distilly-lint [-version] [-model gpt-4] [-fix [-approve-near-duplicates] [-approve-json-conversion]] <prompt-file>")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(version.String())
+		return
+	}
 
 	if flag.NArg() < 1 {
 		flag.Usage()
