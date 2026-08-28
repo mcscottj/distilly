@@ -11,11 +11,13 @@ import (
 	"strings"
 
 	"distilly/internal/context"
+	"distilly/internal/version"
 )
 
 const defaultMaxTokens = 32000
 
 func main() {
+	showVersion := flag.Bool("version", false, "print version and exit")
 	repo := flag.String("repo", ".", "repository root")
 	seed := flag.String("seed", "", "repo-relative seed file path (required)")
 	question := flag.String("question", "", "question guiding file selection")
@@ -25,15 +27,21 @@ func main() {
 	includeTests := flag.Bool("include-tests", false, "include *_test.go files")
 	format := flag.String("format", "report", "output format: report, json, or markdown")
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: distilly-context -seed <path> [flags]")
+		fmt.Fprintln(os.Stderr, "usage: distilly-context [-version] -seed <path> [flags]")
 		fmt.Fprintln(os.Stderr, "")
 		fmt.Fprintln(os.Stderr, "Examples:")
+		fmt.Fprintln(os.Stderr, "  distilly-context -version")
 		fmt.Fprintln(os.Stderr, "  distilly-context -repo . -seed internal/lint/apply.go -question \"why reject streaming?\"")
 		fmt.Fprintln(os.Stderr, "  distilly-context -repo . -seed internal/lint/apply.go -format json")
 		fmt.Fprintln(os.Stderr, "  distilly-context -repo . -seed internal/lint/apply.go -format markdown")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(version.String())
+		return
+	}
 
 	if strings.TrimSpace(*seed) == "" {
 		flag.Usage()
