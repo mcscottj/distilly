@@ -4,7 +4,6 @@
 
 ![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go&logoColor=white)
 ![Wails](https://img.shields.io/badge/Wails-v2-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
 
 A local-first prompt linter and optimizer for developers who use LLM APIs
 heavily. Distilly analyzes prompts and conversation history, flags waste
