@@ -12,3 +12,4 @@ src/frontend/vite.config.d.ts
 src/build/bin
 .worktrees
 local_docs/
+memory-bank/

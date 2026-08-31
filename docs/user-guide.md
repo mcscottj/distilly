@@ -470,4 +470,4 @@ After optimization, the forwarded request contains the selected file contents in
 - Call a local or cloud model to “semantically compress” prompts  
 - Speak Anthropic’s native Messages API (Claude works only via OpenAI-compatible gateways)
 
-For internals and milestone status, see [architecture.md](architecture.md) and [roadmap.md](roadmap.md).
+For internals and planned work, see [architecture.md](architecture.md) and [roadmap.md](roadmap.md).

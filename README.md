@@ -10,34 +10,34 @@ meaning of your prompt.
 
 Think "ESLint for prompts."
 
-## Status
+## Features
 
-Milestones **1–3 are done**: deterministic CLI linter, confidence-tier
-`Apply` (exact auto-apply; near-duplicates and JSON conversion opt-in),
-prompt scoring, and a regression harness that guards optimizations against
-dropping constraints.
+- Token counter + section splitter (System / Examples / History / Question)
+- Exact + near-duplicate detection (lines and few-shot example blocks)
+- History length flagger, cost estimator, prompt score, before/after diff
+- CLI: `distilly-lint` report and `-fix` with approval flags
+- Regression harness (`go test ./...` under `src/`)
+- Desktop app: Lint workspace, Context workspace, Dashboard, Settings
+- Local OpenAI-compatible proxy (non-streaming) — start/stop from Settings
+- Code context: Tree-sitter selection, `distilly-context` CLI, proxy
+  `@distilly:context` marker injection
 
-**Milestone 4 is done**: Wails desktop app (Lint workspace, Dashboard,
-Settings), SQLite persistence, OpenAI-compatible proxy package, and
-`StartProxy` / `StopProxy` / status wired into the App and Settings UI.
+Optimizations are **rule-based Go** today — there is no AI rewrite backend.
+See [`docs/roadmap.md`](docs/roadmap.md) for planned work and
+[`docs/architecture.md`](docs/architecture.md) for how the pieces fit.
 
-**Milestone 5 is done**: Tree-sitter code-context selection (`internal/context`),
-`distilly-context` CLI, desktop Context workspace, and proxy `@distilly:context`
-marker injection.
+## Docs
 
-There is still **no AI rewrite backend** — everything is rule-based Go.
-No CI yet.
-
-See [`docs/roadmap.md`](docs/roadmap.md), [`docs/architecture.md`](docs/architecture.md),
-[`docs/user-guide.md`](docs/user-guide.md), [`docs/prompt-fixtures.md`](docs/prompt-fixtures.md),
-[`docs/code-context-fixtures.md`](docs/code-context-fixtures.md),
-and [`memory-bank/`](memory-bank/) for detail.
+- [`docs/user-guide.md`](docs/user-guide.md) — how to use the CLI, desktop app, and proxy
+- [`docs/architecture.md`](docs/architecture.md) — engine, proxy, and package layout
+- [`docs/roadmap.md`](docs/roadmap.md) — shipped scope and planned work
+- [`docs/prompt-fixtures.md`](docs/prompt-fixtures.md) /
+  [`docs/code-context-fixtures.md`](docs/code-context-fixtures.md) — test fixtures
 
 ## Project layout
 
 ```
-docs/                      Roadmap + architecture overview
-memory-bank/               Agent working memory (progress, patterns, context)
+docs/                      User guide, architecture, roadmap, design history
 test-proxy.sh              Curl a non-streaming chat completion through the local proxy
 src/                       Go module + Wails project root
   main.go, app.go          Desktop entry + UI bindings
@@ -58,26 +58,6 @@ src/                       Go module + Wails project root
   testdata/prompts/        Regression fixtures
   testdata/repos/          Code-context fixture modules
 ```
-
-## What works today
-
-- [x] Token counter + section splitter (System / Examples / History / Question)
-- [x] Exact + near-duplicate detection (lines and few-shot example blocks)
-- [x] History length flagger
-- [x] Cost estimator + prompt score
-- [x] Before/after diff
-- [x] CLI: `distilly-lint` report and `-fix` with approval flags
-- [x] Regression harness (`go test ./...` under `src/`)
-- [x] Desktop Lint workspace (analyze / apply / diff / toggles)
-- [x] Dashboard + Settings (SQLite-backed)
-- [x] Proxy package (non-streaming; tested) — start/stop from Settings
-- [x] Code context: CLI, desktop Context workspace, proxy `@distilly:context` marker
-
-## Later
-
-- History compression (beyond flagging)
-- CI for the regression suite
-- Optional semantic compression via local models (deferred)
 
 ## Tech stack
 

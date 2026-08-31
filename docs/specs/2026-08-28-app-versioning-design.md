@@ -1,7 +1,8 @@
 # App versioning — Design
 
 **Date:** 2026-08-28  
-**Branch:** `feature/app-versioning`
+**Branch:** `feature/app-versioning`  
+**Status:** Implemented
 
 ## Goal
 

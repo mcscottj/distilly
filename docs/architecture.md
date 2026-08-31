@@ -150,10 +150,13 @@ sequenceDiagram
 
 **In plain terms:** Given a seed `.go` file and a question, Distilly walks the import graph (same-package siblings, direct imports, one-hop reverse importers, depth-limited transitive imports) and returns only the files that matter — formatted as markdown code blocks. The proxy can replace an `@distilly:context` marker in the system message with this output before lint optimization runs.
 
-## Milestone context
+## Current scope
 
 See also [`roadmap.md`](roadmap.md).
 
-- **M1–M3:** CLI lint, regression harness, confidence-tier apply — done
-- **M4:** Desktop app + SQLite + proxy lifecycle — done
-- **M5:** Code-context optimizer (Tree-sitter, CLI, desktop workspace, proxy marker) — done
+- CLI lint, regression harness, confidence-tier apply
+- Desktop app + SQLite + proxy lifecycle
+- Code-context optimizer (Tree-sitter, CLI, desktop workspace, proxy marker)
+
+Everything above is rule-based. Planned follow-ons (CI, history
+compression, optional semantic compression) live in the roadmap.

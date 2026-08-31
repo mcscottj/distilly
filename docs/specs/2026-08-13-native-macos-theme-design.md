@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-13  
 **Branch:** `feature/native-macos-theme`  
-**Status:** Approved for implementation planning
+**Status:** Implemented
 
 ## Goal
 

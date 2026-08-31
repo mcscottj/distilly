@@ -1,15 +1,7 @@
 # distilly (src)
 
 Go module and Wails project root. Prefer the [root README](../README.md) for
-product status; this file covers working inside `src/`.
-
-## Status
-
-M1–M3 CLI/engine work is done. M4 desktop + store + proxy package and
-lifecycle bindings are in place. M5 code-context optimizer (Tree-sitter
-Select, CLI, desktop Context workspace, proxy marker) is in place. See
-[`../docs/architecture.md`](../docs/architecture.md) and
-[`../memory-bank/progress.md`](../memory-bank/progress.md).
+product overview; this file covers working inside `src/`.
 
 ## Layout
 
