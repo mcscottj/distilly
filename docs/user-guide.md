@@ -232,7 +232,7 @@ The ChatGPT desktop/web app cannot use this URL — it has no custom API endpoin
 and it streams. For a smoke test from the repo root, start the proxy, then:
 
 ```bash
-./test-proxy.sh
+./scripts/test-proxy.sh
 ```
 
 That sends the same non-streaming `POST /v1/chat/completions` as:
@@ -376,7 +376,7 @@ Miniature repo fixtures are documented in [code-context-fixtures.md](code-contex
 1. In **Settings**, set upstream URL + API key, confirm port, leave passthrough off (unless you only want metrics).  
 2. Set optimization defaults you’re comfortable with.  
 3. **Start proxy**, copy the base URL into your client, disable streaming.  
-   Smoke test from the repo root with `./test-proxy.sh` (not the ChatGPT app).  
+   Smoke test from the repo root with `./scripts/test-proxy.sh` (not the ChatGPT app).  
 4. Use your app normally; check **Dashboard** for tokens/$ saved.  
 5. Use **Passthrough** when you want measurement without changing what the model sees.
 

@@ -38,7 +38,7 @@ See [`docs/roadmap.md`](docs/roadmap.md) for planned work and
 
 ```
 docs/                      User guide, architecture, roadmap, design history
-test-proxy.sh              Curl a non-streaming chat completion through the local proxy
+scripts/                   Release builds, version bump, proxy smoke test
 src/                       Go module + Wails project root
   main.go, app.go          Desktop entry + UI bindings
   cmd/lint/                CLI (distilly-lint)
@@ -146,7 +146,7 @@ To exercise the local proxy (not the ChatGPT app — that has no custom base URL
 start Distilly, **Settings → Start proxy**, then from the repo root:
 
 ```bash
-./test-proxy.sh
+./scripts/test-proxy.sh
 ```
 
 That POSTs `stream: false` to `http://127.0.0.1:8787/v1/chat/completions`. Open

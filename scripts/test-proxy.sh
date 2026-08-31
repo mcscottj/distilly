@@ -9,8 +9,8 @@
 # Then open Dashboard (or click Refresh) to see a `proxy` row.
 #
 # Usage:
-#   ./test-proxy.sh
-#   DISTILLY_PROXY_PORT=8787 ./test-proxy.sh
+#   ./scripts/test-proxy.sh
+#   DISTILLY_PROXY_PORT=8787 ./scripts/test-proxy.sh
 
 set -euo pipefail
 
