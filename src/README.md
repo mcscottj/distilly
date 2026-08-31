@@ -64,6 +64,13 @@ For a versioned release build from the repo root (one bump, desktop + CLIs):
 ./scripts/build-release.sh
 ```
 
+To bump, build desktop only, and publish a macOS GitHub Release (zip of
+`distilly.app`):
+
+```bash
+./scripts/publish-desktop.sh
+```
+
 **Distilly → About Distilly** shows `Version <string>`.
 
 ## Version
@@ -71,6 +78,7 @@ For a versioned release build from the repo root (one bump, desktop + CLIs):
 Source of truth: `internal/version/VERSION`. CLIs: `-version`. Prefer
 `./scripts/build-release.sh` so desktop and CLIs share one bump. Individual
 `build-desktop.sh` / `build-cli.sh` build only (no bump).
+Ship the desktop app to GitHub Releases with `./scripts/publish-desktop.sh`.
 
 Bound on `App` today: `Analyze`, `Apply`, `SelectContext`, `DiffForDuplicate`, `ListModels`,
 dashboard/settings helpers, `LogRequest`, `StartProxy`, `StopProxy`,
