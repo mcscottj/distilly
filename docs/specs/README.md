@@ -9,6 +9,7 @@ Historical design notes for shipped features. These documents explain
 | [2026-08-14-font-size-settings-design.md](2026-08-14-font-size-settings-design.md) | UI / editor font size |
 | [2026-08-14-high-contrast-theme-design.md](2026-08-14-high-contrast-theme-design.md) | High contrast appearance |
 | [2026-08-28-app-versioning-design.md](2026-08-28-app-versioning-design.md) | Shared `YYYYMMDD.N` versioning |
+| [2026-08-31-publish-desktop-release-design.md](2026-08-31-publish-desktop-release-design.md) | Desktop-only GitHub Release script |
 
 For current product scope, see [`../roadmap.md`](../roadmap.md) and the
 [root README](../../README.md).
