@@ -11,7 +11,7 @@
   "frontend:install": "npm install",
   "info": {
     "productName": "Distilly",
-    "productVersion": "20260828.4"
+    "productVersion": "20260901.1"
   },
   "name": "distilly",
   "outputfilename": "distilly"
