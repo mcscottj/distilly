@@ -1,0 +1,59 @@
+System:
+You are an enterprise support agent for Acme Cloud.
+Always reply in JSON.
+Always reply in JSON.
+Please always reply in JSON.
+Do not include markdown in the response.
+Do not include markdown in your response.
+Never invent ticket ids.
+TicketId: TCK-10482
+Customer: Contoso Ltd
+Plan: Enterprise Plus
+Region: us-east-1
+Priority: P1
+OpenedAt: 2026-08-14T12:00:00Z
+Owner: sre-oncall
+
+Catalog entry for the affected product:
+Name: Acme Gateway
+Sku: AGW-PRO
+Tier: gold
+Region: eu-west-1
+Seats: 250
+
+Example 1:
+Q: Status of TCK-10001?
+A: {"ticket":"TCK-10001","state":"open"}
+
+Example 2:
+Q: Status of TCK-10002?
+A: {"ticket":"TCK-10002","state":"resolved"}
+
+Example 3:
+Q: Status of TCK-10001?
+A: {"ticket":"TCK-10001","state":"open"}
+
+Example 4:
+Q: What's the status for TCK-10002?
+A: {"ticket":"TCK-10002","state":"resolved"}
+
+History:
+User: The gateway is returning 502s.
+Assistant: Is it regional or global?
+User: Only us-east-1.
+Assistant: Check the edge health dashboard for that region.
+User: Dashboard is green.
+Assistant: Then inspect upstream origin latency.
+User: Origin p99 jumped to 4s.
+Assistant: That can cascade into 502s at the edge.
+User: We rolled a config change an hour ago.
+Assistant: Can you bisect the last three config revisions?
+User: Rev-41 looks suspicious.
+Assistant: Roll back Rev-41 and re-check p99.
+User: Rollback done; p99 is still high.
+Assistant: Then the regression may be in the origin app, not the gateway.
+User: Origin team says CPU is pegged.
+Assistant: Scale the origin pool and watch error rate for 10 minutes.
+
+Question:
+Produce a JSON incident summary with ticket, region, likely_cause, and next_action.

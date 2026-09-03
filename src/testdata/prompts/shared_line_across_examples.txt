@@ -1,0 +1,20 @@
+System:
+You are a helpful assistant. Always respond in JSON format.
+
+Example 1:
+Q: What is 2 + 2?
+A: {"answer": 4}
+Notes: Keep answers numeric when possible.
+
+Example 2:
+Q: What is the capital of France?
+A: {"answer": "Paris"}
+Notes: Keep answers numeric when possible.
+
+Example 3:
+Q: What is 10 / 2?
+A: {"answer": 5}
+Notes: Prefer integers over floats when exact.
+
+Question:
+What is 7 + 1?

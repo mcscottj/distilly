@@ -1,0 +1,18 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "author": {
+    "email": "",
+    "name": "Distilly"
+  },
+  "frontend:build": "npm run build",
+  "frontend:dev:serverUrl": "auto",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dir": "frontend",
+  "frontend:install": "npm install",
+  "info": {
+    "productName": "Distilly",
+    "productVersion": "20260901.1"
+  },
+  "name": "distilly",
+  "outputfilename": "distilly"
+}

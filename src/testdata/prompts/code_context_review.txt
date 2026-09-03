@@ -1,0 +1,25 @@
+System:
+You are a code-review assistant. Cite file paths when recommending changes.
+Preserve public API signatures unless the question asks for a breaking change.
+Prefer the smallest diff that fixes the reported issue.
+
+History:
+User: Please review this Go Apply path for accidental example corruption.
+Assistant: Focus on whether line-level exact dedupe can reach into example blocks.
+User: Here is a simplified excerpt from the engine:
+
+```go
+func Apply(prompt string, opts ApplyOptions) string {
+    lines := strings.Split(prompt, "\n")
+    dupes := filterToLinesSeenOutsideExamples(dedupe.FindExact(lines), nonExampleLines(prompt))
+    // near-duplicates and example-block collapse gated by opts
+    return reconstruct(prompt, dupes, opts)
+}
+```
+
+Assistant: Good — the filter is the critical guard. Confirm nonExampleLines excludes bodies under Example N headers.
+User: And here is a caller-facing prompt fragment we want to keep intact even if lines repeat across examples (shown as plain text so headers inside the chat are not re-parsed as live sections):
+Assistant: Shared note lines must not collapse across example boundaries. Fragment was: two examples with different Q/A but identical Notes lines.
+
+Question:
+Given the excerpt, what regression assertion should we add so Apply never deletes a distinct example that only shares a Notes line?

@@ -1,0 +1,19 @@
+System:
+You normalize CRM contact cards into structured records.
+Primary contact:
+Name: Jordan Lee
+Age: 41
+City: Austin
+Occupation: Product Manager
+Email: jordan.lee@example.com
+Phone: +1-512-555-0142
+Secondary contact:
+Name: Sam Rivera
+Age: 29
+City: Seattle
+Occupation: Solutions Engineer
+Email: sam.rivera@example.com
+Phone: +1-206-555-0199
+
+Question:
+Merge both contacts into one JSON array under key contacts.

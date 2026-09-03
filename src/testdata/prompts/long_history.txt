@@ -1,0 +1,19 @@
+System:
+You are a helpful assistant.
+
+History:
+User: I'm trying to set up Docker on my machine.
+Assistant: Sure, what OS are you running?
+User: macOS Sonoma.
+Assistant: Got it, install Docker Desktop from docker.com.
+User: Installed, now what?
+Assistant: Run `docker run hello-world` to verify it works.
+User: That worked. Now I want to use Go with it.
+Assistant: You can write a Dockerfile based on golang:1.22.
+User: Written it, build is failing though.
+Assistant: What's the error message?
+User: Networking timeout when pulling the base image.
+Assistant: That sounds like a DNS/proxy issue with your Docker daemon config.
+
+Question:
+Given all that, how do I fix the networking timeout?

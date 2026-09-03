@@ -1,0 +1,9 @@
+System:
+You are a helpful assistant that fills out customer records.
+Name: John Smith
+Age: 30
+City: New York
+Occupation: Software Engineer
+
+Question:
+Summarize this customer's profile in one sentence.

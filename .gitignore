@@ -1,0 +1,15 @@
+/main
+**/.DS_Store
+.claude
+.cursor
+node_modules
+src/frontend/dist/*
+!src/frontend/dist/.gitkeep
+src/frontend/package.json.md5
+src/frontend/*.tsbuildinfo
+src/frontend/vite.config.js
+src/frontend/vite.config.d.ts
+src/build/bin
+.worktrees
+local_docs/
+memory-bank/
